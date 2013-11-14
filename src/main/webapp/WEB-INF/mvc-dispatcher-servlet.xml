@@ -25,14 +25,18 @@
 		<property name="suffix" value=".jsp" />
 	</bean>
 
+	<jpa:repositories base-package="puma.sp.mgmt.model" />
+	<jpa:repositories base-package="puma.sp.mgmt.provider" />
 	<jpa:repositories base-package="puma.sp.mgmt.repositories" />
 
 	<bean id="entityManagerFactory"
-		class="org.springframework.orm.jpa.LocalContainerEntityManagerFactoryBean">
-<!-- 		<property name="persistenceUnitName" value="hsqldbUnit" /> -->
-		<property name="persistenceUnitName" value="mysqlUnit" />
-		<!--  <property name="packagesToScan" value="puma.sp.mgmt.model" />  -->
-		
+		class="org.springframework.orm.jpa.LocalEntityManagerFactoryBean">
+<!-- 	<bean id="entityManagerFactory" -->
+<!-- 		class="org.springframework.orm.jpa.LocalContainerEntityManagerFactoryBean"> -->
+		<!-- <property name="persistenceUnitName" value="hsqldbUnit" /> -->
+		<property name="persistenceUnitName" value="mysqlUnit_mgmt_provider" />
+		<!-- <property name="packagesToScan" value="puma.sp.mgmt.model" /> -->
+
 	</bean>
 
 	<bean id="transactionManager" class="org.springframework.orm.jpa.JpaTransactionManager">

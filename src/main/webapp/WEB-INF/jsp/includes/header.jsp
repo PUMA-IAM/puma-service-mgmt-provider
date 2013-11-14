@@ -17,6 +17,8 @@
 	rel="stylesheet" media="screen" />
 <link href="<c:url value="/resources/css/own-style.css"/>"
 	rel="stylesheet" />
+<link href="<c:url value="/resources/css/prettify.css"/>"
+	rel="stylesheet" />
 
 <!-- HTML5 shim and Respond.js IE8 support of HTML5 elements and media queries -->
 <!--[if lt IE 9]>
@@ -56,28 +58,28 @@
 					<!-- 				</li> -->
 				</ul>
 
-				<c:choose>
-					<c:when test="${empty user}">
-						<div class="navbar-form navbar-right">
-							<a type="submit" class="btn btn-success"
-								href="<c:url value="/user/login"/>">Log in</a>
-						</div>
-					</c:when>
-					<c:otherwise>
-						<ul class="nav navbar-nav navbar-right">
-							<li class=""><a href="<c:url value="/docs"/>">View
-									documents</a></li>
-							<li class=""><a href="<c:url value="/docs/create"/>">Create
-									document</a></li>
-							<li class="dropdown"><a href="#" class="dropdown-toggle"
-								data-toggle="dropdown">Hello, <c:out value="${user}" /> <b
-									class="caret"></b></a>
-								<ul class="dropdown-menu">
-									<li><a href="<c:url value="/user/logout"/>">Log out</a></li>
-								</ul></li>
-						</ul>
-					</c:otherwise>
-				</c:choose>
+<%-- 				<c:choose> --%>
+<%-- 					<c:when test="${empty user}"> --%>
+<!-- 						<div class="navbar-form navbar-right"> -->
+<!-- 							<a type="submit" class="btn btn-success" -->
+<%-- 								href="<c:url value="/user/login"/>">Log in</a> --%>
+<!-- 						</div> -->
+<%-- 					</c:when> --%>
+<%-- 					<c:otherwise> --%>
+<!-- 						<ul class="nav navbar-nav navbar-right"> -->
+<%-- 							<li class=""><a href="<c:url value="/docs"/>">View --%>
+<!-- 									documents</a></li> -->
+<%-- 							<li class=""><a href="<c:url value="/docs/create"/>">Create --%>
+<!-- 									document</a></li> -->
+<!-- 							<li class="dropdown"><a href="#" class="dropdown-toggle" -->
+<%-- 								data-toggle="dropdown">Hello, <c:out value="${user}" /> <b --%>
+<!-- 									class="caret"></b></a> -->
+<!-- 								<ul class="dropdown-menu"> -->
+<%-- 									<li><a href="<c:url value="/user/logout"/>">Log out</a></li> --%>
+<!-- 								</ul></li> -->
+<!-- 						</ul> -->
+<%-- 					</c:otherwise> --%>
+<%-- 				</c:choose> --%>
 			</div>
 			<!--/.nav-collapse -->
 		</div>

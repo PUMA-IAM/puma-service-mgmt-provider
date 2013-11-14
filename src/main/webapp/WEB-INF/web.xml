@@ -26,4 +26,12 @@
         <url-pattern>/initialize</url-pattern>
     </servlet-mapping>
     
+    <listener>
+    	<listener-class>puma.sp.mgmt.provider.DriverDeregistrator</listener-class>
+    </listener>
+    
+    <listener>
+    	<listener-class>puma.sp.mgmt.provider.pdps.ServerInitializer</listener-class>
+    </listener>
+    
 </web-app>
