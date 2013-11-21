@@ -11,17 +11,19 @@ import javax.servlet.ServletContextEvent;
 import javax.servlet.ServletContextListener;
 
 import puma.rmi.pdp.mgmt.PDPRegistryRemote;
+import puma.sp.mgmt.provider.pdps.app.ApplicationPDPManager;
+import puma.sp.mgmt.provider.pdps.central.CentralPUMAPDPManager;
 
 /**
- * Class used for initializing all servers (RMI and alike) when this
- * project is loaded into TomCat.
+ * Class used for initializing all servers (RMI and alike) when this project is
+ * loaded into TomCat.
  * 
  * @author Maarten Decat
- *
+ * 
  */
 public class ServerInitializer implements ServletContextListener {
-	
-	private static final int RMI_REGISITRY_PORT = 2020;
+
+	private static final int RMI_REGISITRY_PORT = 2030;
 
 	private static final Logger logger = Logger
 			.getLogger(ServerInitializer.class.getName());
@@ -33,6 +35,8 @@ public class ServerInitializer implements ServletContextListener {
 
 	@Override
 	public void contextInitialized(ServletContextEvent arg0) {
+		// 1. Set up the RMI registry and the Application PDP Registry listening
+		// on it
 		try {
 			Registry registry;
 			try {
@@ -47,9 +51,15 @@ public class ServerInitializer implements ServletContextListener {
 					.exportObject(ApplicationPDPManager.getInstance(), 0);
 			registry.bind("application-pdp-registry", stub);
 			logger.info("Application PDP Registry up and running (available using RMI with name \"application-pdp-registry\")");
-		} catch(Exception e) {
-			logger.log(Level.SEVERE, "Failed to set up the Application PDP Registry", e);
+		} catch (Exception e) {
+			logger.log(Level.SEVERE,
+					"Failed to set up the Application PDP Registry", e);
 		}
+
+		// 2. Connect to the central PUMA PDP over RMI
+		CentralPUMAPDPManager.getInstance(); // just getting the instance calls
+												// the constructor and
+												// initializes the manager
 	}
 
 }

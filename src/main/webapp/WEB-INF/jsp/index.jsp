@@ -17,7 +17,7 @@
 			<a class="btn btn-primary btn-lg" role="button" href="<c:url value="/application-pdps"/>">Application PDPs &raquo;</a>
 		</div>
 		<div class="col-md-4">
-			<a class="btn btn-primary btn-lg" role="button" href="">Something &raquo;</a>
+			<a class="btn btn-primary btn-lg" role="button" href="<c:url value="/central-puma-pdp"/>">Central PUMA PDP &raquo;</a>
 		</div>
 		<div class="col-md-4">
 			<a class="btn btn-primary btn-lg" role="button" href="">Something else &raquo;</a>
