@@ -29,6 +29,9 @@
 
 <body>
 
+<!-- jQuery (necessary for Bootstrap's JavaScript plugins) -->
+<script src="<c:url value="/resources/js/jquery.js"/>"></script>
+
 	<div class="navbar navbar-default navbar-fixed-top">
 		<div class="container">
 			<div class="navbar-header">
@@ -37,25 +40,13 @@
 					<span class="icon-bar"></span> <span class="icon-bar"></span> <span
 						class="icon-bar"></span>
 				</button>
-				<a class="navbar-brand" href="<c:url value="/"/>">eDocs Inc.</a>
+				<a class="navbar-brand" href="<c:url value="/"/>">PUMA Service Management</a>
 			</div>
 			<div class="navbar-collapse collapse">
 				<ul class="nav navbar-nav">
-					<li class="active"><a href="<c:url value="/"/>">Home</a></li>
-					<li><a href="#about">About</a></li>
-					<li><a href="#contact">Contact</a></li>
-					<!-- 				<li class="dropdown"><a href="#" class="dropdown-toggle" -->
-					<!-- 					data-toggle="dropdown">Dropdown <b class="caret"></b></a> -->
-					<!-- 					<ul class="dropdown-menu"> -->
-					<!-- 						<li><a href="#">Action</a></li> -->
-					<!-- 						<li><a href="#">Another action</a></li> -->
-					<!-- 						<li><a href="#">Something else here</a></li> -->
-					<!-- 						<li class="divider"></li> -->
-					<!-- 						<li class="dropdown-header">Nav header</li> -->
-					<!-- 						<li><a href="#">Separated link</a></li> -->
-					<!-- 						<li><a href="#">One more separated link</a></li> -->
-					<!-- 					</ul> -->
-					<!-- 				</li> -->
+					<li><a href="<c:url value="/tenants"/>">Tenants</a></li>
+					<li><a href="<c:url value="/application-pdps"/>">Application PDPs</a></li>
+					<li><a href="<c:url value="/central-puma-pdp"/>">Central PUMA PDP</a></li>
 				</ul>
 
 <%-- 				<c:choose> --%>

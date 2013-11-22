@@ -49,16 +49,22 @@ public class CentralPUMAPDPManager {
 			Thread thread = new Thread(new Runnable() {				
 				@Override
 				public void run() {
-					while(true) {
-						if(setupCentralPUMAPDPConnection()) {
-							return; // end the thread here
-						} else {
-							logger.info("Failed again, trying again in 5 sec");
-							try {
-								Thread.sleep(5000);
-							} catch (InterruptedException e) {
-								logger.log(Level.WARNING, "Sleep interrupted, is this important?", e);
+					boolean go = true;
+					while(go) {
+						try {
+							if(setupCentralPUMAPDPConnection()) {
+								return; // end the thread here
+							} else {
+								logger.info("Failed again, trying again in 5 sec");
+								try {
+									Thread.sleep(5000);
+								} catch (InterruptedException e) {
+									logger.log(Level.WARNING, "Sleep interrupted, is this important?", e);
+								}
 							}
+						} catch(IllegalStateException e) {
+							// this is thrown if the web application was stopped (I think)
+							go = false;
 						}
 					}
 				}

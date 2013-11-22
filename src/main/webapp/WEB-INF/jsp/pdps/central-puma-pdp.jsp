@@ -3,7 +3,7 @@
 <%@taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c"%>
 <%@ taglib prefix='fn' uri='http://java.sun.com/jsp/jstl/functions' %>
 
-<jsp:include page="includes/header.jsp" />
+<jsp:include page="../includes/header.jsp" />
 
 <div class="container">
 	<div class="row">
@@ -53,4 +53,4 @@
 	</div>
 </div>
 
-<jsp:include page="includes/footer.jsp" />
+<jsp:include page="../includes/footer.jsp" />

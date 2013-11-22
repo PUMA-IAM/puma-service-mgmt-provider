@@ -106,7 +106,7 @@ public class CentralPUMAPDPController {
     	model.addAttribute("pdp", CentralPUMAPDPManager.getInstance().getOverview());
     	model.addAttribute("msgs", MessageManager.getInstance().getMessages(session));
     	model.addAttribute("default_policy", DEFAULT_CENTRAL_PUMA_PDP_POLICY);
-    	return "central-puma-pdp";
+    	return "pdps/central-puma-pdp";
     }
     
     @RequestMapping(value = "/central-puma-pdp/policy/load", method = RequestMethod.POST)

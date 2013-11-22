@@ -6,7 +6,7 @@
 		<provider>org.hibernate.ejb.HibernatePersistence</provider>
 		<class>puma.sp.mgmt.model.application.Service</class>
 		<class>puma.sp.mgmt.model.attribute.Attribute</class>
-		<class>puma.sp.mgmt.model.attribute.AttributeType</class>
+		<class>puma.sp.mgmt.model.attribute.AttributeFamily</class>
 		<class>puma.sp.mgmt.model.user.User</class>
 		<class>puma.sp.mgmt.model.user.SessionRequest</class>
 		<class>puma.sp.mgmt.model.organization.Tenant</class>

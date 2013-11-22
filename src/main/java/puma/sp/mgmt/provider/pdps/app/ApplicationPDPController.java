@@ -47,7 +47,7 @@ public class ApplicationPDPController {
     	model.addAttribute("pdps", ApplicationPDPManager.getInstance().getOverview());
     	model.addAttribute("msgs", MessageManager.getInstance().getMessages(session));
     	model.addAttribute("default_policy", DEFAULT_APPLICATION_POLICY);
-    	return "application-pdps";
+    	return "pdps/application-pdps";
     }
     
     @RequestMapping(value = "/application-pdps/{pdpId}")
@@ -55,7 +55,7 @@ public class ApplicationPDPController {
     	ApplicationPDPOverview pdp = ApplicationPDPManager.getInstance().getOverview(applicationPDPId);
     	model.addAttribute("pdp", pdp);
     	model.addAttribute("msgs", MessageManager.getInstance().getMessages(session));
-    	return "application-pdp";
+    	return "pdps/application-pdp";
     }
     
     @RequestMapping(value = "/application-pdps/policy/load", method = RequestMethod.POST)
