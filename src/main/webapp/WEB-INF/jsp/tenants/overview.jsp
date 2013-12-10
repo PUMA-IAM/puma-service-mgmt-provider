@@ -118,7 +118,20 @@
 						<input name="file" type="file" id="input-logo">
 					</div>
 				</div>
-
+				<div class="form-group">
+					<label for="input-name" class="col-sm-2 control-label">Username</label>
+					<div class="col-sm-10">
+						<input name="loginName" class="form-control" id="input-name"
+							placeholder="Username">
+					</div>
+				</div>
+				<div class="form-group">
+					<label for="input-name" class="col-sm-2 control-label">Password</label>
+					<div class="col-sm-10">
+						<input name="password" class="form-control" id="input-name"
+							placeholder="Password">
+					</div>
+				</div>
 				<div class="form-group">
 					<div class="col-sm-offset-2 col-sm-10">
 						<button type="submit" class="btn btn-default">Create

@@ -32,7 +32,7 @@
 									<td><c:out value="${af.multiplicity}" /></td>
 									<td><c:out value="${af.dataType}" /></td>
 									<td><a class="btn btn-danger btn-sm"
-										href="<c:url value="/attribute-families/${af.id}/delete"/>"><span
+										href="<c:url value="/organizations/${org.id}/attribute-families/${af.id}/delete"/>"><span
 											class="glyphicon glyphicon-chevron-right"></span> Delete</a></td>
 								</tr>
 							</c:forEach>
@@ -51,45 +51,41 @@
 	<div class="row">
 		<div class="col-md-12">
 			<form class="form-horizontal" role="form" method="post"
-				action="<c:url value="/organizations/${org.id}/attribute-families/create-impl"/>">
+				action="<c:url value="//organizations/${org.id}/attribute-families/create-impl"/>">
 				<div class="form-group">
 					<label for="input-name" class="col-sm-2 control-label">Name</label>
 					<div class="col-sm-10">
 						<input name="name" class="form-control" id="input-name"
-							placeholder="Name">
+							placeholder="Attribute Family Name">
 					</div>
 				</div>
 				<div class="form-group">
-					<label for="input-mgmt-type" class="col-sm-2 control-label">Multiplicity</label>
+					<label for="input-name" class="col-sm-2 control-label">XACML identifier</label>
 					<div class="col-sm-10">
-						<div class="radio">
-							<label> <input type="radio" name="mgmt-type"
-								id="mgmt-type-option-locally" value="locally" checked>
-								Locally
-							</label>
-						</div>
-						<div class="radio">
-							<label> <input type="radio" name="mgmt-type"
-								id="mgmt-type-option-fedauthn" value="fedauthn">
-								Federated authentication, local authorization
-							</label>
-						</div>
-						<div class="radio">
-							<label> <input type="radio" name="mgmt-type"
-								id="mgmt-type-option-fedauthz" value="fedauthz">
-								Federated authentication, federated authorization
-							</label>
-						</div>
+						<input name="xacmlid" class="form-control" id="input-name"
+							placeholder="">
 					</div>
 				</div>
 				<div class="form-group">
-					<label for="input-authn-endpoint" class="col-sm-2 control-label">Data type</label>
-					<div class="col-sm-10">
-						<input name="authn-endpoint" class="form-control"
-							id="input-authn-endpoint" placeholder="URL" disabled>
-					</div>
-				</div>
-
+						<label for="input-name" class="col-sm-2 control-label">Datatype</label>
+						<div class="controls">
+							<select name="datatype" class="form-control">
+								<c:forEach items="${datatypes}" var="datatype">
+									<option value="${datatype}">${datatype}</option>
+								</c:forEach>
+							</select>
+						</div>
+				</div>				
+				<div class="form-group">
+						<label for="input-name" class="col-sm-2 control-label">Multiplicity</label>
+						<div class="controls">
+							<select name="multiplicity" class="form-control">
+								<c:forEach items="${multiplicityValues}" var="multiplicityValue">
+									<option value="${multiplicityValue}">${multiplicityValue}</option>
+								</c:forEach>
+							</select>
+						</div>
+				</div>				
 				<div class="form-group">
 					<div class="col-sm-offset-2 col-sm-10">
 						<button type="submit" class="btn btn-default">Create

@@ -12,14 +12,19 @@ import org.springframework.web.bind.annotation.RequestParam;
 
 import puma.sp.mgmt.model.organization.Tenant;
 import puma.sp.mgmt.model.organization.TenantMgmtType;
+import puma.sp.mgmt.model.user.User;
 import puma.sp.mgmt.provider.msgs.MessageManager;
 import puma.sp.mgmt.repositories.organization.TenantService;
+import puma.sp.mgmt.repositories.user.UserService;
 
 @Controller
 public class TenantController {
 	
 	@Autowired
 	TenantService tenantService;
+	
+	@Autowired
+	UserService userService;
 
 	@RequestMapping(value = "/tenants")
 	public String tenantOverview(ModelMap model, HttpSession session) {
@@ -38,7 +43,9 @@ public class TenantController {
 			@RequestParam(value = "authn-endpoint", defaultValue = "") String authnEndpoint,
 			@RequestParam(value = "attr-endpoint", defaultValue = "") String attrEndpoint,
 			@RequestParam(value = "idp-public-key", defaultValue = "") String idpPublicKey,
-			@RequestParam(value = "authz-endpoint", defaultValue = "") String authzEndpoint) {
+			@RequestParam(value = "authz-endpoint", defaultValue = "") String authzEndpoint,
+			@RequestParam(value = "loginName", defaultValue = "admin") String userName,
+			@RequestParam(value = "password", defaultValue = "admin") String password) {
 		// translate the mgmt type
 		TenantMgmtType realMgmtType = TenantMgmtType.Locally;
 		if(mgmtType == "fedauthn") {
@@ -49,6 +56,13 @@ public class TenantController {
 		
 		Tenant tenant = new Tenant(name, realMgmtType, authnEndpoint, idpPublicKey, attrEndpoint, authzEndpoint);
 		tenantService.addTenant(tenant);
+		// also construct user
+		User user = new User();
+		user.setLoginName(userName);
+		user.setPassword(password);
+		user.setTenant(tenant);
+		this.userService.addUser(user);
+		
 		Long tenantId = tenant.getId();
 		MessageManager.getInstance().addMessage(session, "success", "Tenant successfully created.");
 		

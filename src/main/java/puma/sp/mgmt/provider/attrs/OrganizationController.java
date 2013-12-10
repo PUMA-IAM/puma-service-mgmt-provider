@@ -1,5 +1,9 @@
 package puma.sp.mgmt.provider.attrs;
 
+import java.util.ArrayList;
+import java.util.List;
+
+import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -101,38 +105,35 @@ public class OrganizationController {
 		model.addAttribute("org", org);
 		model.addAttribute("msgs",
 				MessageManager.getInstance().getMessages(session));
+		List<String> dataTypes = new ArrayList<String>(DataType.values().length);
+		for (DataType next: DataType.values())
+			dataTypes.add(next.toString());
+		model.addAttribute("datatypes", dataTypes);
+		List<String> multiplicityValues = new ArrayList<String>(Multiplicity.values().length);
+		for (Multiplicity next: Multiplicity.values()) 
+			multiplicityValues.add(next.toString());
+		model.addAttribute("multiplicityValues", multiplicityValues);
 		return "organizations/organization";
 	}
 
 	@RequestMapping(value = "/organizations/{organizationId}/attribute-families/create-impl", method = RequestMethod.POST)
-	public String createAttributeFamilyImplementation(ModelMap model,
-			HttpSession session,
-			@PathVariable("organizationId") Long organizationId,
+	public String addFamily(
+			@PathVariable("organizationId") Long organizationId, 
 			@RequestParam("name") String name,
+			@RequestParam("xacmlid") String xacmlIdentifier,
 			@RequestParam("multiplicity") String multiplicity,
-			@RequestParam("dataType") String dataType) {
-		Organization org = organizationService.findOne(organizationId);
-
-		// First check whether the organization exists
-		if (org == null) {
-			MessageManager.getInstance().addMessage(session, "failure",
-					"Organization with id " + organizationId + " not found.");
-			return "redirect:/";
-		}
-
-		// translate multiplicy
-		Multiplicity realMultiplicity = Multiplicity.ATOMIC; // TODO
-
-		// translate datatype
-		DataType realDataType = DataType.Boolean; // TODO
-
-		AttributeFamily af = new AttributeFamily(name, realMultiplicity,
-				realDataType, org);
-		attributeFamilyService.add(af);
-		MessageManager.getInstance().addMessage(session, "success",
-				"Subtenant successfully created.");
-
-		return "redirect:/organizations/" + organizationId;
+			@RequestParam("datatype") String datatype,
+			ModelMap model, HttpSession session, HttpServletRequest request	
+			) {
+		Organization organization = this.organizationService.findOne(organizationId);
+		AttributeFamily family = new AttributeFamily();
+		family.setDataType(DataType.valueOf(datatype));
+		family.setDefinedBy(organization);
+		family.setMultiplicity(Multiplicity.valueOf(multiplicity));
+		family.setName(name);
+		family.setXacmlIdentifier(xacmlIdentifier);
+		this.attributeFamilyService.add(family);
+		return "redirect:/organizations/" + organizationId.toString();		
 	}
 
 	@RequestMapping(value = "/organizations/{organizationId}/attribute-families/{attributeFamilyId}/delete")
@@ -157,7 +158,7 @@ public class OrganizationController {
 		
 		// Now do the delete the attribute family
 		String name = af.getName();
-		attributeFamilyService.delete(af);
+		attributeFamilyService.delete(af.getId());
 		MessageManager.getInstance().addMessage(session, "success", "Attribute family " + name + " succesfully deleted.");
 		return "redirect:/organizations/" + organizationId;
 	}
