@@ -1,9 +1,6 @@
 package puma.sp.mgmt.provider;
 
-import java.util.logging.Logger;
-
 import javax.servlet.http.HttpSession;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.ModelMap;
@@ -15,9 +12,6 @@ import puma.sp.mgmt.repositories.organization.OrganizationService;
 
 @Controller
 public class MainController {
-
-	private static final Logger logger = Logger.getLogger(MainController.class
-			.getName());
 	
 	@Autowired
 	OrganizationService organizationService;
