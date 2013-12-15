@@ -1,5 +1,8 @@
 package puma.sp.mgmt.provider.tenants;
 
+import java.security.NoSuchAlgorithmException;
+import java.security.spec.InvalidKeySpecException;
+
 import javax.servlet.http.HttpSession;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -53,19 +56,22 @@ public class TenantController {
 		} else if(mgmtType == "fedauthz") {
 			realMgmtType = TenantMgmtType.FederatedAuthorization;
 		}
-		
-		Tenant tenant = new Tenant(name, realMgmtType, authnEndpoint, idpPublicKey, attrEndpoint, authzEndpoint);
-		tenantService.addTenant(tenant);
-		// also construct user
-		User user = new User();
-		user.setLoginName(userName);
-		user.setPassword(password);
-		user.setTenant(tenant);
-		this.userService.addUser(user);
-		
-		Long tenantId = tenant.getId();
-		MessageManager.getInstance().addMessage(session, "success", "Tenant successfully created.");
-		
+		Long tenantId = null;
+		try {
+			Tenant tenant = new Tenant(name, realMgmtType, authnEndpoint, idpPublicKey, attrEndpoint, authzEndpoint);
+			// also construct user
+			User user = new User();
+			user.setLoginName(userName);
+			user.setPassword(password);
+			user.setTenant(tenant);
+			this.tenantService.addTenant(tenant);
+			this.userService.addUser(user);
+			tenantId = tenant.getId();
+			MessageManager.getInstance().addMessage(session, "success", "Tenant successfully created.");
+		} catch (NoSuchAlgorithmException | InvalidKeySpecException e) {
+			MessageManager.getInstance().addMessage(session, "failure", "Could not create tenant - user initialization failed: " + e.getMessage());
+			return "redirect:/tenants";
+		}		
 		return "redirect:/tenants/" + tenantId;
 	}
 
