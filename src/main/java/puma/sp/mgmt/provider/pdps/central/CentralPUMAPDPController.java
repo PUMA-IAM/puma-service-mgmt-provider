@@ -32,16 +32,8 @@ public class CentralPUMAPDPController {
     		"            xsi:schemaLocation=\"urn:oasis:names:tc:xacml:2.0:policy:schema:os\" \n" + 
     		"            PolicySetId=\"central-puma-policy\" \n" + 
     		"            PolicyCombiningAlgId=\"urn:oasis:names:tc:xacml:1.0:policy-combining-algorithm:deny-overrides\">\n" + 
-    		"	<Description>The policy for reading documents.</Description>\n" + 
+    		"	<Description>The policy for reading and creating documents.</Description>\n" + 
     		"	<Target>\n" + 
-    		"		<Actions>\n" + 
-    		"			<Action>\n" + 
-    		"				<ActionMatch MatchId=\"urn:oasis:names:tc:xacml:1.0:function:string-equal\">\n" + 
-    		"				  <AttributeValue DataType=\"http://www.w3.org/2001/XMLSchema#string\">read</AttributeValue>\n" + 
-    		"					<ActionAttributeDesignator AttributeId=\"action:id\" DataType=\"http://www.w3.org/2001/XMLSchema#string\"/>\n" + 
-    		"				</ActionMatch>\n" + 
-    		"			</Action>\n" + 
-    		"		</Actions>\n" + 
     		"		<Resources>\n" + 
     		"			<Resource>\n" + 
     		"				<ResourceMatch MatchId=\"urn:oasis:names:tc:xacml:1.0:function:string-equal\">\n" + 
@@ -51,53 +43,97 @@ public class CentralPUMAPDPController {
     		"			</Resource>\n" + 
     		"		</Resources>\n" + 
     		"	</Target>\n" + 
-    		"	<Policy xmlns=\"urn:oasis:names:tc:xacml:2.0:policy:schema:os\" \n" + 
-    		"          xmlns:xacml-context=\"urn:oasis:names:tc:xacml:2.0:context:schema:os\" \n" + 
-    		"          xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" \n" + 
-    		"          xsi:schemaLocation=\"urn:oasis:names:tc:xacml:2.0:policy:schema:os http://docs.oasis-open.org/xacml/access_control-xacml-2.0-policy-schema-os.xsd\" \n" + 
-    		"          xmlns:md=\"urn:mdc:xacml\" \n" + 
-    		"          PolicyId=\"policy:1\" \n" + 
-    		"          RuleCombiningAlgId=\"urn:oasis:names:tc:xacml:1.0:rule-combining-algorithm:deny-overrides\">\n" + 
-    		"	  <Description>PhD users can only check stuff owned by their organization</Description>\n" + 
+    		"  <PolicySet  xmlns=\"urn:oasis:names:tc:xacml:2.0:policy:schema:os\" \n" + 
+    		"              xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" \n" + 
+    		"              xsi:schemaLocation=\"urn:oasis:names:tc:xacml:2.0:policy:schema:os\" \n" + 
+    		"              PolicySetId=\"policy:reading-deleting\" \n" + 
+    		"              PolicyCombiningAlgId=\"urn:oasis:names:tc:xacml:1.0:policy-combining-algorithm:deny-overrides\">\n" + 
+    		"	  <Description>The policy for reading and deleting documents.</Description>\n" + 
     		"	  <Target>\n" + 
-    		"	    <Subjects>\n" + 
-    		"		    <Subject>\n" + 
-    		"			    <SubjectMatch MatchId=\"urn:oasis:names:tc:xacml:1.0:function:string-equal\">\n" + 
-    		"			      <AttributeValue DataType=\"http://www.w3.org/2001/XMLSchema#string\">phd</AttributeValue>\n" + 
-    		"				    <SubjectAttributeDesignator AttributeId=\"subject:roles\" DataType=\"http://www.w3.org/2001/XMLSchema#string\"/>\n" + 
-    		"			    </SubjectMatch>\n" + 
-    		"		    </Subject>\n" + 
-    		"	    </Subjects>\n" + 
-    		"    </Target>\n" + 
-    		"	  <Rule RuleId=\"rule:1\" Effect=\"Deny\">\n" + 
-    		"		  <Description>This is just the single rule for the above policy.</Description>\n" + 
-    		"		  <Condition>	      \n" + 
-    		"        <Apply FunctionId=\"urn:oasis:names:tc:xacml:1.0:function:not\">\n" + 
-    		"          <Apply FunctionId=\"urn:oasis:names:tc:xacml:1.0:function:string-equal\">\n" + 
-    		"            <Apply FunctionId=\"urn:oasis:names:tc:xacml:1.0:function:string-one-and-only\">\n" + 
-    		"              <ResourceAttributeDesignator AttributeId=\"object:owning-tenant\" DataType=\"http://www.w3.org/2001/XMLSchema#string\"/>\n" + 
-    		"            </Apply>\n" + 
-    		"            <Apply FunctionId=\"urn:oasis:names:tc:xacml:1.0:function:string-one-and-only\">\n" + 
-    		"              <SubjectAttributeDesignator AttributeId=\"subject:tenant\" DataType=\"http://www.w3.org/2001/XMLSchema#string\"/>\n" + 
+    		"		  <Actions>\n" + 
+    		"			  <Action>\n" + 
+    		"				  <ActionMatch MatchId=\"urn:oasis:names:tc:xacml:1.0:function:string-equal\">\n" + 
+    		"				    <AttributeValue DataType=\"http://www.w3.org/2001/XMLSchema#string\">read</AttributeValue>\n" + 
+    		"					  <ActionAttributeDesignator AttributeId=\"action:id\" DataType=\"http://www.w3.org/2001/XMLSchema#string\"/>\n" + 
+    		"				  </ActionMatch>\n" + 
+    		"			  </Action>\n" + 
+    		"			  <Action>\n" + 
+    		"				  <ActionMatch MatchId=\"urn:oasis:names:tc:xacml:1.0:function:string-equal\">\n" + 
+    		"				    <AttributeValue DataType=\"http://www.w3.org/2001/XMLSchema#string\">delete</AttributeValue>\n" + 
+    		"					  <ActionAttributeDesignator AttributeId=\"action:id\" DataType=\"http://www.w3.org/2001/XMLSchema#string\"/>\n" + 
+    		"				  </ActionMatch>\n" + 
+    		"			  </Action>\n" + 
+    		"		  </Actions>\n" + 
+    		"	  </Target>\n" + 
+    		"	  <Policy xmlns=\"urn:oasis:names:tc:xacml:2.0:policy:schema:os\" \n" + 
+    		"            xmlns:xacml-context=\"urn:oasis:names:tc:xacml:2.0:context:schema:os\" \n" + 
+    		"            xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" \n" + 
+    		"            xsi:schemaLocation=\"urn:oasis:names:tc:xacml:2.0:policy:schema:os http://docs.oasis-open.org/xacml/access_control-xacml-2.0-policy-schema-os.xsd\" \n" + 
+    		"            xmlns:md=\"urn:mdc:xacml\" \n" + 
+    		"            PolicyId=\"policy:1\" \n" + 
+    		"            RuleCombiningAlgId=\"urn:oasis:names:tc:xacml:1.0:rule-combining-algorithm:deny-overrides\">\n" + 
+    		"	    <Description>Users can only read and delete stuff owned by their organization</Description>\n" + 
+    		"	    <Target></Target>\n" + 
+    		"	    <Rule RuleId=\"rule:1\" Effect=\"Deny\">\n" + 
+    		"		    <Description>This is just the single rule for the above policy.</Description>\n" + 
+    		"		    <Condition>	      \n" + 
+    		"          <Apply FunctionId=\"urn:oasis:names:tc:xacml:1.0:function:not\">\n" + 
+    		"            <Apply FunctionId=\"urn:oasis:names:tc:xacml:1.0:function:string-equal\">\n" + 
+    		"              <Apply FunctionId=\"urn:oasis:names:tc:xacml:1.0:function:string-one-and-only\">\n" + 
+    		"                <ResourceAttributeDesignator AttributeId=\"object:creating-tenant\" DataType=\"http://www.w3.org/2001/XMLSchema#string\"/>\n" + 
+    		"              </Apply>\n" + 
+    		"              <Apply FunctionId=\"urn:oasis:names:tc:xacml:1.0:function:string-one-and-only\">\n" + 
+    		"                <SubjectAttributeDesignator AttributeId=\"subject:tenant\" DataType=\"http://www.w3.org/2001/XMLSchema#string\"/>\n" + 
+    		"              </Apply>\n" + 
     		"            </Apply>\n" + 
     		"          </Apply>\n" + 
-    		"        </Apply>\n" + 
-    		"		  </Condition>\n" + 
-    		"	  </Rule>\n" + 
-    		"  </Policy>\n" + 
-    		"  <Policy xmlns=\"urn:oasis:names:tc:xacml:2.0:policy:schema:os\" \n" + 
-    		"          xmlns:xacml-context=\"urn:oasis:names:tc:xacml:2.0:context:schema:os\" \n" + 
-    		"          xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" \n" + 
-    		"          xsi:schemaLocation=\"urn:oasis:names:tc:xacml:2.0:policy:schema:os http://docs.oasis-open.org/xacml/access_control-xacml-2.0-policy-schema-os.xsd\" \n" + 
-    		"          xmlns:md=\"urn:mdc:xacml\" \n" + 
-    		"          PolicyId=\"policy:default-permit:1\" \n" + 
-    		"          RuleCombiningAlgId=\"urn:oasis:names:tc:xacml:1.0:rule-combining-algorithm:deny-overrides\">\n" + 
-    		"    <Description>Default permit.</Description>\n" + 
-    		"    <Target></Target>\n" + 
-    		"    <Rule RuleId=\"rule:default-permit:1\" Effect=\"Permit\">\n" + 
-    		"      <Description>This is just the single rule for the above policy.</Description>\n" + 
-    		"    </Rule>\n" + 
-    		"  </Policy>\n" + 
+    		"		    </Condition>\n" + 
+    		"	    </Rule>\n" + 
+    		"    </Policy>\n" + 
+    		"    <Policy xmlns=\"urn:oasis:names:tc:xacml:2.0:policy:schema:os\" \n" + 
+    		"            xmlns:xacml-context=\"urn:oasis:names:tc:xacml:2.0:context:schema:os\" \n" + 
+    		"            xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" \n" + 
+    		"            xsi:schemaLocation=\"urn:oasis:names:tc:xacml:2.0:policy:schema:os http://docs.oasis-open.org/xacml/access_control-xacml-2.0-policy-schema-os.xsd\" \n" + 
+    		"            xmlns:md=\"urn:mdc:xacml\" \n" + 
+    		"            PolicyId=\"policy:default-permit:1\" \n" + 
+    		"            RuleCombiningAlgId=\"urn:oasis:names:tc:xacml:1.0:rule-combining-algorithm:deny-overrides\">\n" + 
+    		"      <Description>Default permit.</Description>\n" + 
+    		"      <Target></Target>\n" + 
+    		"      <Rule RuleId=\"rule:default-permit:1\" Effect=\"Permit\">\n" + 
+    		"        <Description>This is just the single rule for the above policy.</Description>\n" + 
+    		"      </Rule>\n" + 
+    		"    </Policy>\n" + 
+    		"  </PolicySet>\n" + 
+    		"  <PolicySet  xmlns=\"urn:oasis:names:tc:xacml:2.0:policy:schema:os\" \n" + 
+    		"              xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" \n" + 
+    		"              xsi:schemaLocation=\"urn:oasis:names:tc:xacml:2.0:policy:schema:os\" \n" + 
+    		"              PolicySetId=\"policy:creating\" \n" + 
+    		"              PolicyCombiningAlgId=\"urn:oasis:names:tc:xacml:1.0:policy-combining-algorithm:deny-overrides\">\n" + 
+    		"	  <Description>The policy for creating documents.</Description>\n" + 
+    		"	  <Target>\n" + 
+    		"		  <Actions>\n" + 
+    		"			  <Action>\n" + 
+    		"				  <ActionMatch MatchId=\"urn:oasis:names:tc:xacml:1.0:function:string-equal\">\n" + 
+    		"				    <AttributeValue DataType=\"http://www.w3.org/2001/XMLSchema#string\">create</AttributeValue>\n" + 
+    		"					  <ActionAttributeDesignator AttributeId=\"action:id\" DataType=\"http://www.w3.org/2001/XMLSchema#string\"/>\n" + 
+    		"				  </ActionMatch>\n" + 
+    		"			  </Action>\n" + 
+    		"		  </Actions>\n" + 
+    		"	  </Target>\n" + 
+    		"    <Policy xmlns=\"urn:oasis:names:tc:xacml:2.0:policy:schema:os\" \n" + 
+    		"            xmlns:xacml-context=\"urn:oasis:names:tc:xacml:2.0:context:schema:os\" \n" + 
+    		"            xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" \n" + 
+    		"            xsi:schemaLocation=\"urn:oasis:names:tc:xacml:2.0:policy:schema:os http://docs.oasis-open.org/xacml/access_control-xacml-2.0-policy-schema-os.xsd\" \n" + 
+    		"            xmlns:md=\"urn:mdc:xacml\" \n" + 
+    		"            PolicyId=\"policy:default-permit:99\" \n" + 
+    		"            RuleCombiningAlgId=\"urn:oasis:names:tc:xacml:1.0:rule-combining-algorithm:deny-overrides\">\n" + 
+    		"      <Description>Default permit.</Description>\n" + 
+    		"      <Target></Target>\n" + 
+    		"      <Rule RuleId=\"rule:default-permit:99\" Effect=\"Permit\">\n" + 
+    		"        <Description>This is just the single rule for the above policy.</Description>\n" + 
+    		"      </Rule>\n" + 
+    		"    </Policy>\n" + 
+    		"  </PolicySet>\n" + 
     		"</PolicySet>";
     
     @RequestMapping(value = "/central-puma-pdp")
