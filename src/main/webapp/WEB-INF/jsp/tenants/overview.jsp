@@ -119,14 +119,14 @@
 					</div>
 				</div>
 				<div class="form-group">
-					<label for="input-name" class="col-sm-2 control-label">Username</label>
+					<label for="input-name" class="col-sm-2 control-label">Admin username</label>
 					<div class="col-sm-10">
 						<input name="loginName" class="form-control" id="input-name"
 							placeholder="Username">
 					</div>
 				</div>
 				<div class="form-group">
-					<label for="input-name" class="col-sm-2 control-label">Password</label>
+					<label for="input-name" class="col-sm-2 control-label">Admin password</label>
 					<div class="col-sm-10">
 						<input name="password" class="form-control" id="input-name"
 							placeholder="Password">
