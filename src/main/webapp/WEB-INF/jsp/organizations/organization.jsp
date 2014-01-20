@@ -19,6 +19,7 @@
 						<thead>
 							<tr>
 								<th>Name</th>
+								<th>XACML Identifier</th>
 								<th>Multiplicity</th>
 								<th>Data type</th>
 								<th></th>
@@ -29,6 +30,7 @@
 								varStatus="status">
 								<tr>
 									<td><c:out value="${af.name}" /></td>
+									<td><c:out value="${af.xacmlIdentifier}" /></td>
 									<td><c:out value="${af.multiplicity}" /></td>
 									<td><c:out value="${af.dataType}" /></td>
 									<td><a class="btn btn-danger btn-sm"

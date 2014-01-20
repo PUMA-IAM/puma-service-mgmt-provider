@@ -111,24 +111,20 @@
 					<label for="input-mgmt-type" class="col-sm-2 control-label">Management
 						type</label>
 					<div class="col-sm-10">
-						<div class="radio">
-							<label> <input type="radio" name="mgmt-type"
-								id="mgmt-type-option-locally" value="locally" checked>
-								Locally
-							</label>
-						</div>
-						<div class="radio">
-							<label> <input type="radio" name="mgmt-type"
-								id="mgmt-type-option-fedauthn" value="fedauthn">
-								Federated authentication, local authorization
-							</label>
-						</div>
-						<div class="radio">
-							<label> <input type="radio" name="mgmt-type"
-								id="mgmt-type-option-fedauthz" value="fedauthz">
-								Federated authentication, federated authorization
-							</label>
-						</div>
+						<c:choose>
+							<c:when test="${empty managementValues}">
+							</c:when>
+							<c:otherwise>
+								<c:forEach var="mgmtValue" items="${managementValues}" varStatus="status">
+									<div class="radio">
+										<label>
+											<input type="radio" name="mgmt-type" id="mgmt-type-option-${mgmtValue}" value="${mgmtValue}">
+												${mgmtValue.description}
+										</label>
+									</div>
+								</c:forEach>
+							</c:otherwise>
+						</c:choose>
 					</div>
 				</div>
 				<div class="form-group">
@@ -171,6 +167,21 @@
 						<input name="file" type="file" id="input-logo">
 					</div>
 				</div>
+				
+				<div class="form-group">
+					<label for="input-userName" class="col-sm-2 control-label">Username</label>
+					<div class="col-sm-10">
+						<input name="userName" class="form-control"
+							id="input-userName" placeholder="Name">
+					</div>
+				</div>
+				<div class="form-group">
+					<label for="input-password" class="col-sm-2 control-label">Password</label>
+					<div class="col-sm-10">
+						<input name="password" class="form-control"
+							id="input-password" placeholder="Password">
+					</div>
+				</div>
 
 				<div class="form-group">
 					<div class="col-sm-offset-2 col-sm-10">
@@ -187,21 +198,27 @@
 	(function($) {
 		$(function() {
 			$('input:radio[name="mgmt-type"]').change(function() {
-				if ($(this).val() == "locally") {
+				if ($(this).val() == "Locally") {
 					$("#input-authn-endpoint").prop('disabled', true);
 					$("#input-idp-public-key").prop('disabled', true);
 					$("#input-attr-endpoint").prop('disabled', true);
 					$("#input-authz-endpoint").prop('disabled', true);
-				} else if ($(this).val() == "fedauthn") {
+					$("#input-userName").prop('disabled', false);
+					$("#input-password").prop('disabled', false);
+				} else if ($(this).val() == "FederatedAuthentication") {
 					$("#input-authn-endpoint").prop('disabled', false);
 					$("#input-idp-public-key").prop('disabled', false);
 					$("#input-attr-endpoint").prop('disabled', false);
 					$("#input-authz-endpoint").prop('disabled', true);
+					$("#input-userName").prop('disabled', true);
+					$("#input-password").prop('disabled', true);
 				} else { // fedauthz
 					$("#input-authn-endpoint").prop('disabled', false);
 					$("#input-idp-public-key").prop('disabled', false);
 					$("#input-attr-endpoint").prop('disabled', false);
 					$("#input-authz-endpoint").prop('disabled', false);
+					$("#input-userName").prop('disabled', true);
+					$("#input-password").prop('disabled', true);
 				}
 			});
 		});

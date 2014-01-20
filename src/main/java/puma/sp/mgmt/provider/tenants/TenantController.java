@@ -35,6 +35,8 @@ public class TenantController {
 
 		model.addAttribute("msgs",
 				MessageManager.getInstance().getMessages(session));
+
+		model.addAttribute("managementValues", TenantMgmtType.values());
 		return "tenants/overview";
 	}
 
@@ -50,22 +52,21 @@ public class TenantController {
 			@RequestParam(value = "loginName", defaultValue = "admin") String userName,
 			@RequestParam(value = "password", defaultValue = "admin") String password) {
 		// translate the mgmt type
-		TenantMgmtType realMgmtType = TenantMgmtType.Locally;
-		if(mgmtType == "fedauthn") {
-			realMgmtType = TenantMgmtType.FederatedAuthentication;
-		} else if(mgmtType == "fedauthz") {
-			realMgmtType = TenantMgmtType.FederatedAuthorization;
-		}
+		TenantMgmtType realMgmtType = TenantMgmtType.valueOf(mgmtType);
 		Long tenantId = null;
 		try {
 			Tenant tenant = new Tenant(name, realMgmtType, authnEndpoint, idpPublicKey, attrEndpoint, authzEndpoint);
-			// also construct user
-			User user = new User();
-			user.setLoginName(userName);
-			user.setPassword(password);
-			user.setTenant(tenant);
+			User user = null;
+			if (realMgmtType == TenantMgmtType.Locally) {
+				// also construct user
+				user = new User();
+				user.setLoginName(userName);
+				user.setPassword(password);
+				user.setTenant(tenant);
+			}
 			this.tenantService.addTenant(tenant);
-			this.userService.addUser(user);
+			if (user != null)
+				this.userService.addUser(user);
 			tenantId = tenant.getId();
 			MessageManager.getInstance().addMessage(session, "success", "Tenant successfully created.");
 		} catch (NoSuchAlgorithmException | InvalidKeySpecException e) {
@@ -87,6 +88,7 @@ public class TenantController {
 		}
 		
 		model.addAttribute("tenant", tenant);		
+		model.addAttribute("managementValues", TenantMgmtType.values());
 		model.addAttribute("msgs",
 				MessageManager.getInstance().getMessages(session));
 		return "tenants/tenant";
@@ -118,7 +120,9 @@ public class TenantController {
 			@RequestParam(value = "authn-endpoint", defaultValue = "") String authnEndpoint,
 			@RequestParam(value = "attr-endpoint", defaultValue = "") String attrEndpoint,
 			@RequestParam(value = "idp-public-key", defaultValue = "") String idpPublicKey,
-			@RequestParam(value = "authz-endpoint", defaultValue = "") String authzEndpoint) {
+			@RequestParam(value = "authz-endpoint", defaultValue = "") String authzEndpoint,
+			@RequestParam(value = "userName", defaultValue = "") String userName,
+			@RequestParam(value = "password", defaultValue = "") String password) {
 		Tenant tenant = tenantService.findOne(tenantId);
 
 		// First check whether the tenant exists
@@ -128,20 +132,29 @@ public class TenantController {
 		}
 		
 		// translate the mgmt type
-		TenantMgmtType realMgmtType = TenantMgmtType.Locally;
-		if(mgmtType == "fedauthn") {
-			realMgmtType = TenantMgmtType.FederatedAuthentication;
-		} else if(mgmtType == "fedauthz") {
-			realMgmtType = TenantMgmtType.FederatedAuthorization;
+		TenantMgmtType realMgmtType = TenantMgmtType.valueOf(mgmtType);
+		
+		try {
+			User user = null;
+			Tenant subtenant = new Tenant(name, realMgmtType, authnEndpoint, idpPublicKey, attrEndpoint, authzEndpoint);
+			subtenant.setSuperTenant(tenant);
+			if (realMgmtType == TenantMgmtType.Locally) {
+				user = new User();
+				user.setLoginName(userName);
+				user.setPassword(password);
+				user.setTenant(subtenant);
+			}
+			tenantService.addTenant(subtenant);
+			if (user != null)
+				userService.addUser(user);
+			Long subtenantId = subtenant.getId();
+			MessageManager.getInstance().addMessage(session, "success", "Subtenant successfully created.");
+			
+			return "redirect:/tenants/" + subtenantId;
+		} catch (NoSuchAlgorithmException | InvalidKeySpecException e) {
+				MessageManager.getInstance().addMessage(session, "failure", "Could not generate user for subtenant: " + e.getMessage() + ". Please contact your administrator.");
+				return "redirect:/tenants/" + tenantId;
 		}
-		
-		Tenant subtenant = new Tenant(name, realMgmtType, authnEndpoint, idpPublicKey, attrEndpoint, authzEndpoint);
-		subtenant.setSuperTenant(tenant);
-		tenantService.addTenant(subtenant);
-		Long subtenantId = subtenant.getId();
-		MessageManager.getInstance().addMessage(session, "success", "Subtenant successfully created.");
-		
-		return "redirect:/tenants/" + subtenantId;
 	}
 
 }

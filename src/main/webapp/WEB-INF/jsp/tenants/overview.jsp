@@ -58,24 +58,20 @@
 					<label for="input-mgmt-type" class="col-sm-2 control-label">Management
 						type</label>
 					<div class="col-sm-10">
-						<div class="radio">
-							<label> <input type="radio" name="mgmt-type"
-								id="mgmt-type-option-locally" value="locally" checked>
-								Locally
-							</label>
-						</div>
-						<div class="radio">
-							<label> <input type="radio" name="mgmt-type"
-								id="mgmt-type-option-fedauthn" value="fedauthn">
-								Federated authentication, local authorization
-							</label>
-						</div>
-						<div class="radio">
-							<label> <input type="radio" name="mgmt-type"
-								id="mgmt-type-option-fedauthz" value="fedauthz">
-								Federated authentication, federated authorization
-							</label>
-						</div>
+						<c:choose>
+							<c:when test="${empty managementValues}">
+							</c:when>
+							<c:otherwise>
+								<c:forEach var="mgmtValue" items="${managementValues}" varStatus="status">
+									<div class="radio">
+										<label>
+											<input type="radio" name="mgmt-type" id="mgmt-type-option-${mgmtValue}" value="${mgmtValue}">
+												${mgmtValue.description}
+										</label>
+									</div>
+								</c:forEach>
+							</c:otherwise>
+						</c:choose>
 					</div>
 				</div>
 				<div class="form-group">
@@ -121,17 +117,18 @@
 				<div class="form-group">
 					<label for="input-name" class="col-sm-2 control-label">Admin username</label>
 					<div class="col-sm-10">
-						<input name="loginName" class="form-control" id="input-name"
+						<input name="loginName" class="form-control" id="input-username"
 							placeholder="Username">
 					</div>
 				</div>
 				<div class="form-group">
 					<label for="input-name" class="col-sm-2 control-label">Admin password</label>
 					<div class="col-sm-10">
-						<input name="password" class="form-control" id="input-name"
+						<input name="password" class="form-control" id="input-password"
 							placeholder="Password">
 					</div>
 				</div>
+				
 				<div class="form-group">
 					<div class="col-sm-offset-2 col-sm-10">
 						<button type="submit" class="btn btn-default">Create
@@ -147,21 +144,27 @@
 	(function($) {
 		$(function() {
 			$('input:radio[name="mgmt-type"]').change(function() {
-				if ($(this).val() == "locally") {
+				if ($(this).val() == "Locally") {
 					$("#input-authn-endpoint").prop('disabled', true);
 					$("#input-idp-public-key").prop('disabled', true);
 					$("#input-attr-endpoint").prop('disabled', true);
 					$("#input-authz-endpoint").prop('disabled', true);
-				} else if ($(this).val() == "fedauthn") {
+					$("#input-username").prop('disabled', false);
+					$("#input-password").prop('disabled', false);
+				} else if ($(this).val() == "FederatedAuthentication") {
 					$("#input-authn-endpoint").prop('disabled', false);
 					$("#input-idp-public-key").prop('disabled', false);
 					$("#input-attr-endpoint").prop('disabled', false);
 					$("#input-authz-endpoint").prop('disabled', true);
+					$("#input-username").prop('disabled', true);
+					$("#input-password").prop('disabled', true);
 				} else { // fedauthz
 					$("#input-authn-endpoint").prop('disabled', false);
 					$("#input-idp-public-key").prop('disabled', false);
 					$("#input-attr-endpoint").prop('disabled', false);
 					$("#input-authz-endpoint").prop('disabled', false);
+					$("#input-username").prop('disabled', true);
+					$("#input-password").prop('disabled', true);
 				}
 			});
 		});
