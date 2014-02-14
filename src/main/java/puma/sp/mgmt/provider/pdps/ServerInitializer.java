@@ -23,7 +23,7 @@ import puma.sp.mgmt.provider.pdps.central.CentralPUMAPDPManager;
  */
 public class ServerInitializer implements ServletContextListener {
 
-	private static final int RMI_REGISITRY_PORT = 2030;
+	private static final int RMI_REGISITRY_PORT = 2050;
 
 	private static final Logger logger = Logger
 			.getLogger(ServerInitializer.class.getName());
