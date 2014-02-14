@@ -115,6 +115,8 @@ public class CentralPUMAPDPManager {
 	 */
 	public CentralPUMAPDPOverview getOverview() {
 		String status;
+		if (!this.isCentralPUMAPDPConnectionOK())
+			return new CentralPUMAPDPOverview("Could not establish a connection", "");
 		try {
 			status = centralPUMAPDP.getStatus();
 		} catch (RemoteException e) {
