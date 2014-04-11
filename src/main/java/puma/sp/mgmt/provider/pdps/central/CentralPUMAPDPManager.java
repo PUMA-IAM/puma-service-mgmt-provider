@@ -115,8 +115,9 @@ public class CentralPUMAPDPManager {
 	 */
 	public CentralPUMAPDPOverview getOverview() {
 		String status;
-		if (!this.isCentralPUMAPDPConnectionOK())
+		if (!this.isCentralPUMAPDPConnectionOK()) {
 			return new CentralPUMAPDPOverview("Could not establish a connection", "");
+		}
 		try {
 			status = centralPUMAPDP.getStatus();
 		} catch (RemoteException e) {
@@ -129,6 +130,20 @@ public class CentralPUMAPDPManager {
 			policy = "RemoteException: " + e.getMessage();
 		}
 		return new CentralPUMAPDPOverview(status, policy);
+	}
+	
+	/**
+	 * Returns the metrics of the central PUMA PDP as JSON string.
+	 */
+	public String getMetrics() {
+		if (!this.isCentralPUMAPDPConnectionOK()) {
+			return "Could not establish a connection";
+		}
+		try {
+			return centralPUMAPDP.getMetrics();
+		} catch(RemoteException e) {
+			return e.getMessage();
+		}
 	}
 
 }
