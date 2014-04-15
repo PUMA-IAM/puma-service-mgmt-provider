@@ -11,6 +11,7 @@
 </div>
 
 <div class="container">
+<!-- 
 	<div class="row">
 		<div class="col-md-12">
 			<h1 class="page-header">Provider management</h1>
@@ -21,6 +22,7 @@
 			<a class="btn btn-default btn-lg" role="button" href="<c:url value="/organizations/${provider.id}"/>">Overview &raquo;</a>
 		</div>
 	</div>
+	-->
 	<div class="row">
 		<div class="col-md-12">
 			<h1 class="page-header">Tenant management</h1>
