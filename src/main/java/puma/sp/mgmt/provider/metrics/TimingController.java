@@ -14,4 +14,9 @@ public class TimingController {
 	public @ResponseBody String results() {
 		return CentralPUMAPDPManager.getInstance().getMetrics();
 	}
+	
+	@RequestMapping(value = "/metrics/central-pdp/reset", method = RequestMethod.GET)
+	public @ResponseBody void reset() {
+		CentralPUMAPDPManager.getInstance().resetMetrics();
+	}
 }

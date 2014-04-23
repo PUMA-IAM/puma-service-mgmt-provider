@@ -145,5 +145,13 @@ public class CentralPUMAPDPManager {
 			return e.getMessage();
 		}
 	}
+	
+	public void resetMetrics() {
+		try {
+			centralPUMAPDP.resetMetrics();
+		} catch (RemoteException e) {
+			logger.log(Level.WARNING, e.getMessage());
+		}
+	}
 
 }
