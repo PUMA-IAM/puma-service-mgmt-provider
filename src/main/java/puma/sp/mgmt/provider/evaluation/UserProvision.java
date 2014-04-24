@@ -110,5 +110,17 @@ public class UserProvision {
 			return Boolean.TRUE.toString();
 		}
 	}
+	
+	@ResponseBody
+	@RequestMapping(value = "/removeAllUsers", method = RequestMethod.GET)
+	public void removeAll() {
+		for (User next: this.userRepo.findAll()) {
+			for (Attribute nextAttr: next.getAttributes())
+				this.attributeService.deleteAttribute(nextAttr);
+			if (this.userRepo.findOne(next.getId()) != null)
+				this.userRepo.delete(next);
+		}
+		
+	}
 
 }

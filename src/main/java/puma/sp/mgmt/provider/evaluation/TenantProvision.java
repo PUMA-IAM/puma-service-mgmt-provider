@@ -3,6 +3,7 @@ package puma.sp.mgmt.provider.evaluation;
 import java.rmi.RemoteException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
 
 import org.apache.commons.lang.StringEscapeUtils;
 import org.apache.xml.security.exceptions.Base64DecodingException;
@@ -103,6 +104,25 @@ public class TenantProvision {
 		else
 			this.familyService.delete(id);
 		return Boolean.TRUE.toString();
+	}
+	
+	@ResponseBody
+	@RequestMapping(value = "/removeAllTenants", method = RequestMethod.GET)
+	public void removeAll() {
+		for (Tenant next: this.tenantRep.findAll()) {
+			for (Tenant subTenant: next.getSubtenants()) {
+				subTenant.setSuperTenant(null);
+				this.tenantRep.saveAndFlush(subTenant);
+			}
+			next.setSubtenants(null);
+			this.tenantRep.saveAndFlush(next);
+			for (Policy nextPolicy: this.policyService.getPolicies(next))
+				this.policyService.removePolicy(nextPolicy.getId());
+			for (AttributeFamily nextFamily: next.getAttributeFamilies())
+				this.familyService.delete(nextFamily.getId());
+			if (this.tenantService.findOne(next.getId()) != null)
+				this.tenantRep.delete(next);
+		}
 	}
 	
 	
