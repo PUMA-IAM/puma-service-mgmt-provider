@@ -3,11 +3,8 @@ package puma.sp.mgmt.provider.evaluation;
 import java.rmi.RemoteException;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Set;
 
 import org.apache.commons.lang.StringEscapeUtils;
-import org.apache.xml.security.exceptions.Base64DecodingException;
-import org.apache.xml.security.utils.Base64;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.util.MultiValueMap;
@@ -66,7 +63,7 @@ public class TenantProvision {
 			this.policyService.storePolicy(policy);
 			// Deploy
 			deploy(policy);
-		}		
+		}
 		return create.getId().toString();
 	}
 	
