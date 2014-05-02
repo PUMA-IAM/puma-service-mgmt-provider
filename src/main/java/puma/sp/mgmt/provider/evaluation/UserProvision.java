@@ -16,6 +16,7 @@ import puma.sp.mgmt.model.attribute.AttributeFamily;
 import puma.sp.mgmt.model.organization.Tenant;
 import puma.sp.mgmt.model.user.User;
 import puma.sp.mgmt.repositories.attribute.AttributeFamilyService;
+import puma.sp.mgmt.repositories.attribute.AttributeRepository;
 import puma.sp.mgmt.repositories.attribute.AttributeService;
 import puma.sp.mgmt.repositories.organization.TenantService;
 import puma.sp.mgmt.repositories.user.UserRepository;
@@ -35,6 +36,8 @@ public class UserProvision {
 	private AttributeFamilyService familyService;
 	@Autowired
 	private AttributeService attributeService;
+	@Autowired
+	private AttributeRepository attributeRepository;
 
 	@ResponseBody
 	@RequestMapping(value = "/createSubject", method = RequestMethod.GET)
@@ -114,13 +117,8 @@ public class UserProvision {
 	@ResponseBody
 	@RequestMapping(value = "/removeAllUsers", method = RequestMethod.GET)
 	public void removeAll() {
-		for (User next: this.userRepo.findAll()) {
-			for (Attribute nextAttr: next.getAttributes())
-				this.attributeService.deleteAttribute(nextAttr);
-			if (this.userRepo.findOne(next.getId()) != null)
-				this.userRepo.delete(next);
-		}
-		
+		this.attributeRepository.deleteAll();
+		this.userRepo.deleteAll();	
 	}
 
 }

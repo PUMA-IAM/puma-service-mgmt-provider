@@ -117,7 +117,7 @@ public class TenantProvision {
 				this.policyService.removePolicy(nextPolicy.getId());
 			for (AttributeFamily nextFamily: next.getAttributeFamilies())
 				this.familyService.delete(nextFamily.getId());
-			if (this.tenantService.findOne(next.getId()) != null)
+			if (this.tenantService.exists(next.getId()))
 				this.tenantRep.delete(next);
 		}
 	}
