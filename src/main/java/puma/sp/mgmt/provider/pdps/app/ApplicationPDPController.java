@@ -15,6 +15,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseBody;
 
 import puma.rmi.pdp.mgmt.ApplicationPDPMgmtRemote;
 import puma.sp.mgmt.provider.msgs.MessageManager;
@@ -65,6 +66,19 @@ public class ApplicationPDPController {
     	return "redirect:/application-pdps";
     }
     
+    @ResponseBody
+    @RequestMapping(value = "/application-pdps/policy/load/rest", method = RequestMethod.POST)
+    public String loadPolicyREST(@RequestParam("policy") String policy) {
+    	try {
+    		loadPolicy(policy, null);
+    	} catch (Exception e) {
+    		logger.warning("Could not load policy provided via REST interface. Reinstating default policy...");
+    		loadPolicy(DEFAULT_APPLICATION_POLICY, null);
+    		return Boolean.FALSE.toString();
+    	}
+    	return Boolean.TRUE.toString();    	
+    }
+    
     @RequestMapping(value = "/application-pdps/policy/load/default")
     public String loadDefaultApplicationPDP(ModelMap model, HttpSession session) {
     	String defaultPolicy = DEFAULT_APPLICATION_POLICY;
@@ -94,14 +108,16 @@ public class ApplicationPDPController {
 				logger.log(Level.WARNING, "Error when loading application policy", e);
 			}
     	}
-    	if(errors.isEmpty()) {
-    		MessageManager.getInstance().addMessage(session, "success", "Policy loaded");
-    	} else {
-    		String err = "Errors were encountered when loading the default policy: ";
-    		for(Exception e: errors.values()) {
-    			err += e.getMessage() + ", ";
-    		}
-    		MessageManager.getInstance().addMessage(session, "warning", err);
+    	if (session != null) {
+	    	if(errors.isEmpty()) {
+	    		MessageManager.getInstance().addMessage(session, "success", "Policy loaded");
+	    	} else {
+	    		String err = "Errors were encountered when loading the default policy: ";
+	    		for(Exception e: errors.values()) {
+	    			err += e.getMessage() + ", ";
+	    		}
+	    		MessageManager.getInstance().addMessage(session, "warning", err);
+	    	}
     	}
     }
 
