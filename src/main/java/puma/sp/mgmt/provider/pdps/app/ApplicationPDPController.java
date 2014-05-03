@@ -11,6 +11,7 @@ import javax.servlet.http.HttpSession;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.ModelMap;
+import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
@@ -68,11 +69,17 @@ public class ApplicationPDPController {
     
     @ResponseBody
     @RequestMapping(value = "/application-pdps/policy/load/rest", method = RequestMethod.POST)
-    public String loadPolicyREST(@RequestParam("policy") String policy) {
+    public String loadPolicyREST(@RequestParam(value = "policy", required = false) String policy) {
+    	if (policy == null) {
+    		logger.info("Did not redeploy any policy. No argument given!");
+    		return Boolean.FALSE.toString();
+    	}    		
     	try {
+    		logger.info("Deploying policy... [" + StringUtils.countOccurrencesOf(policy, "\n") + "]");
     		loadPolicy(policy, null);
-    	} catch (Exception e) {
-    		logger.warning("Could not load policy provided via REST interface. Reinstating default policy...");
+    		logger.warning("Succesfully deployed policy using the REST interace.");
+    	} catch (Exception e) {    		
+    		logger.log(Level.WARNING, "Could not load policy provided via REST interface. Reinstating default policy...", e);
     		loadPolicy(DEFAULT_APPLICATION_POLICY, null);
     		return Boolean.FALSE.toString();
     	}
@@ -84,6 +91,22 @@ public class ApplicationPDPController {
     	String defaultPolicy = DEFAULT_APPLICATION_POLICY;
     	loadPolicy(defaultPolicy, session);    	
     	return "redirect:/application-pdps";
+    }
+    
+    @ResponseBody
+    @RequestMapping(value = "/application-pdps/enableremote")
+    public String enableRemoteAccess(@RequestParam(value = "enabled", defaultValue = "false") String enabled) {
+    	for(ApplicationPDPMgmtRemote appPDP: ApplicationPDPManager.getInstance().getApplicationPDPs()) {
+    		try {
+    			logger.info("Setting remote access for application PDP to [" + enabled + "]");
+    			appPDP.setRemoteDBAccess(Boolean.parseBoolean(enabled));
+    			logger.info("Set remote access for application PDP to [" + enabled + "]");
+			} catch (Exception e) {
+				logger.log(Level.WARNING, "Error enabling remote access for application PDP", e);
+				return Boolean.FALSE.toString();
+			}
+    	}
+    	return Boolean.TRUE.toString();
     }
     
     /**

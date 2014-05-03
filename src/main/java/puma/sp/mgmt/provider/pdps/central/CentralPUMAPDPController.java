@@ -12,6 +12,7 @@ import org.springframework.ui.ModelMap;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseBody;
 
 import puma.rmi.pdp.mgmt.CentralPUMAPDPMgmtRemote;
 import puma.sp.mgmt.provider.msgs.MessageManager;
@@ -152,6 +153,19 @@ public class CentralPUMAPDPController {
     	return "redirect:/central-puma-pdp";
     }
     
+    @ResponseBody
+    @RequestMapping(value = "/central-puma-pdp/policy/load/rest", method = RequestMethod.POST)
+    public String loadPolicyREST(@RequestParam("policy") String policy) {
+    	try {
+    		loadPolicy(policy, null);
+    	} catch (Exception e) {
+    		logger.warning("Could not load policy provided via REST interface. Reinstating default policy...");
+    		loadPolicy(DEFAULT_CENTRAL_PUMA_PDP_POLICY, null);
+    		return Boolean.FALSE.toString();
+    	}
+    	return Boolean.TRUE.toString();    
+    }
+    
     @RequestMapping(value = "/central-puma-pdp/policy/load/default")
     public String loadDefaultApplicationPDP(ModelMap model, HttpSession session) {
     	String defaultPolicy = DEFAULT_CENTRAL_PUMA_PDP_POLICY;
@@ -175,9 +189,13 @@ public class CentralPUMAPDPController {
 		try {
 			centralPUMAPDP.loadCentralPUMAPolicy(policy);
 			logger.info("Succesfully reloaded Central PUMA PDP policy");
-    		MessageManager.getInstance().addMessage(session, "success", "Policy loaded into Central PUMA PDP.");
+			if (session != null) {
+				MessageManager.getInstance().addMessage(session, "success", "Policy loaded into Central PUMA PDP.");
+			}
 		} catch (RemoteException e) {
-			MessageManager.getInstance().addMessage(session, "warning", e.getMessage());
+			if (session != null) {
+				MessageManager.getInstance().addMessage(session, "warning", e.getMessage());
+			}
 			logger.log(Level.WARNING, "Error when loading Central PUMA PDP policy", e);
 		}
     }
