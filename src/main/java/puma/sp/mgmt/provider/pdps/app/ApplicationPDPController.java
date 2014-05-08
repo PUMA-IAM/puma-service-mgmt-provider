@@ -77,7 +77,7 @@ public class ApplicationPDPController {
     	try {
     		logger.info("Deploying policy... [" + StringUtils.countOccurrencesOf(policy, "\n") + "]");
     		loadPolicy(policy, null);
-    		logger.warning("Succesfully deployed policy using the REST interace.");
+    		logger.info("Succesfully deployed policy using the REST interace.");
     	} catch (Exception e) {    		
     		logger.log(Level.WARNING, "Could not load policy provided via REST interface. Reinstating default policy...", e);
     		loadPolicy(DEFAULT_APPLICATION_POLICY, null);
