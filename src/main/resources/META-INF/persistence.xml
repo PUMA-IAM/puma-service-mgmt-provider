@@ -14,7 +14,6 @@
 		<class>puma.sp.mgmt.model.organization.Tenant</class>
 		<class>puma.sp.mgmt.model.organization.Organization</class>
 		<class>puma.sp.mgmt.model.policy.Policy</class>
-		<class>puma.sp.mgmt.model.policy.PolicyType</class>
 		<properties>
 			<property name="hibernate.dialect" value="org.hibernate.dialect.MySQLDialect" />
 			<property name="javax.persistence.jdbc.driver" value="com.mysql.jdbc.Driver" />
