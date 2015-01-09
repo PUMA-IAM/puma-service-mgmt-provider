@@ -11,6 +11,10 @@
 			<h1 class="page-header">
 				<c:out value="${tenant.name}" />
 			</h1>
+			<h3>Policy Language</h3>
+			<p>
+				<c:out value="${tenant.policyLanguage}" />
+			</p>
 			<h3>Management type</h3>
 			<p>
 				<c:out value="${tenant.managementType}" />

@@ -10,7 +10,9 @@
 		<div class="col-md-12">
 			<h1>Overview</h1>
 			<h3>Status</h3>
-			<p><c:out value="${pdp.status}" /></p>
+			<c:forEach var="pdp" items="${pdps}" varStatus="status">
+				<p><c:out value="${pdp.langType}: ${pdp.status}" /></p>
+			</c:forEach>
 		</div>
 	</div>
 
@@ -23,7 +25,11 @@
 	<div class="row">
 		<div class="col-md-12">
 			<h2>Current</h2>
-			<pre class="prettyprint linenums"><c:out value="${pdp.policy}" /></pre>
+				<h3>STAPL</h3>
+				<pre class="prettyprint linenums"><c:out value="${central_policy_stapl}" /></pre>
+				
+				<h3>XACML</h3>
+				<pre class="prettyprint linenums"><c:out value="${central_policy_xacml}" /></pre>
 		</div>
 	</div>
 
@@ -32,9 +38,15 @@
 			<h2>Update</h2>
 			<form role="form" method="post"
 				action="<c:url value="/central-puma-pdp/policy/load"/>">
+				<h3>STAPL</h3>
 				<div class="form-group">
 					<textarea class="form-control" style="width: 100%; height: 500px;"
-						name="policy"><c:out value="${pdp.policy}" /></textarea>
+						name="staplPolicy"><c:out value="${central_policy_stapl}" /></textarea>
+				</div>
+				<h3>XACML</h3>
+				<div class="form-group">
+					<textarea class="form-control" style="width: 100%; height: 500px;"
+						name="xacmlPolicy"><c:out value="${central_policy_xacml}" /></textarea>
 				</div>
 				<div class="form-group">
 					<button type="submit" class="btn btn-default">Deploy
@@ -47,7 +59,10 @@
 	<div class="row">
 		<div class="col-md-12">
 			<h2>Restore default</h2>
-			<pre class="prettyprint linenums"><c:out value="${default_policy}" /></pre>
+			<h3>STAPL</h3>
+			<pre class="prettyprint linenums"><c:out value="${default_policy_stapl}" /></pre>
+			<h3>XACML</h3>
+			<pre class="prettyprint linenums"><c:out value="${default_policy_xacml}" /></pre>
 			<a href="<c:url value="/central-puma-pdp/policy/load/default"/>" class="btn btn-default">Restore</a>
 		</div>
 	</div>

@@ -14,6 +14,7 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 
 import puma.rmi.pdp.mgmt.CentralPUMAPDPMgmtRemote;
+import puma.sp.mgmt.model.organization.PolicyLangType;
 import puma.sp.mgmt.provider.msgs.MessageManager;
 import puma.sp.mgmt.repositories.policy.PolicyService;
 
@@ -25,8 +26,25 @@ public class CentralPUMAPDPController {
 	
 	@Autowired
 	private PolicyService policyService;
+	
+	
+	private static final String DEFAULT_CENTRAL_PUMA_PDP_POLICY_STAPL =
+			"resource.type = SimpleAttribute(String)\n" +
+			"action.id = SimpleAttribute(String)\n" +
+			"subject.tenant = SimpleAttribute(String)\n" +
+			"resource.creating_tenant = SimpleAttribute(\"creating-tenant\", String)\n" +
+			"\n" +
+			"Policy(\"central-puma-policy\") := when (resource.type === \"document\") apply DenyOverrides to (\n" +
+			"  Policy(\"policy:reading-deleting\") := when ((action.id === \"read\") | (action.id === \"delete\")) apply DenyOverrides to (\n" +
+			"    Rule(\"policy:1\") := deny iff (!(resource.creating_tenant === subject.tenant)),\n" +
+			"    Rule(\"default-permit1\") := permit\n" +
+			"  )," +
+			"  Policy(\"policy:creating\") := when (action.id === \"create\") apply DenyOverrides to (\n" +
+			"    Rule(\"default-permit99\") := permit\n" +
+			"  )\n" +
+			")";
     
-    private static final String DEFAULT_CENTRAL_PUMA_PDP_POLICY = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n" + 
+    private static final String DEFAULT_CENTRAL_PUMA_PDP_POLICY_XACML = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n" + 
     		"<PolicySet  xmlns=\"urn:oasis:names:tc:xacml:2.0:policy:schema:os\" \n" + 
     		"            xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" \n" + 
     		"            xsi:schemaLocation=\"urn:oasis:names:tc:xacml:2.0:policy:schema:os\" \n" + 
@@ -138,24 +156,26 @@ public class CentralPUMAPDPController {
     
     @RequestMapping(value = "/central-puma-pdp")
     public String applicationPDPOverview(ModelMap model, HttpSession session) {
-    	model.addAttribute("central_policy", policyService.getCentralPUMAPDPPolicy());
-    	model.addAttribute("pdp", CentralPUMAPDPManager.getInstance().getOverview());
+    	model.addAttribute("central_policy_stapl", policyService.getCentralPUMAPDPPolicy(PolicyLangType.STAPL));
+    	model.addAttribute("central_policy_xacml", policyService.getCentralPUMAPDPPolicy(PolicyLangType.XACML));
+    	model.addAttribute("pdps", CentralPUMAPDPManager.getInstance().getOverview());
     	model.addAttribute("msgs", MessageManager.getInstance().getMessages(session));
-    	model.addAttribute("default_policy", DEFAULT_CENTRAL_PUMA_PDP_POLICY);
+    	model.addAttribute("default_policy_stapl", DEFAULT_CENTRAL_PUMA_PDP_POLICY_STAPL);
+    	model.addAttribute("default_policy_xacml", DEFAULT_CENTRAL_PUMA_PDP_POLICY_XACML);
     	return "pdps/central-puma-pdp";
     }
     
     @RequestMapping(value = "/central-puma-pdp/policy/load", method = RequestMethod.POST)
     public String loadPolicy(ModelMap model, HttpSession session,
-			@RequestParam("policy") String policy) {
-    	loadPolicy(policy, session);
+			@RequestParam("staplPolicy") String staplPolicy,
+			@RequestParam("xacmlPolicy") String xacmlPolicy) {
+    	loadPolicy(staplPolicy, xacmlPolicy, session);
     	return "redirect:/central-puma-pdp";
     }
     
     @RequestMapping(value = "/central-puma-pdp/policy/load/default")
     public String loadDefaultApplicationPDP(ModelMap model, HttpSession session) {
-    	String defaultPolicy = DEFAULT_CENTRAL_PUMA_PDP_POLICY;
-    	loadPolicy(defaultPolicy, session);    	
+    	loadPolicy(DEFAULT_CENTRAL_PUMA_PDP_POLICY_STAPL,DEFAULT_CENTRAL_PUMA_PDP_POLICY_XACML, session);    	
     	return "redirect:/central-puma-pdp";
     }
     
@@ -166,14 +186,15 @@ public class CentralPUMAPDPController {
      * @param policy
      * @param session
      */
-    private void loadPolicy(String policy, HttpSession session) {
+    private void loadPolicy(String staplPolicy, String xacmlPolicy, HttpSession session) {
     	// 1. store into the db
-    	policyService.storeCentralPUMAPDPPolicy(policy);
+    	policyService.storeCentralPUMAPDPPolicy(staplPolicy, PolicyLangType.STAPL);
+    	policyService.storeCentralPUMAPDPPolicy(xacmlPolicy, PolicyLangType.XACML);
     	
     	// 2. load into Central PUMA PDP 
-    	CentralPUMAPDPMgmtRemote centralPUMAPDP = CentralPUMAPDPManager.getInstance().getCentralPUMAPDP();
 		try {
-			centralPUMAPDP.loadCentralPUMAPolicy(policy);
+			CentralPUMAPDPManager.getInstance().getCentralPUMAPDP(PolicyLangType.STAPL.name()).loadCentralPUMAPolicy(staplPolicy);
+			CentralPUMAPDPManager.getInstance().getCentralPUMAPDP(PolicyLangType.XACML.name()).loadCentralPUMAPolicy(xacmlPolicy);
 			logger.info("Succesfully reloaded Central PUMA PDP policy");
     		MessageManager.getInstance().addMessage(session, "success", "Policy loaded into Central PUMA PDP.");
 		} catch (RemoteException e) {

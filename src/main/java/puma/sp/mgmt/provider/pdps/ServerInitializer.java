@@ -10,7 +10,7 @@ import java.util.logging.Logger;
 import javax.servlet.ServletContextEvent;
 import javax.servlet.ServletContextListener;
 
-import puma.rmi.pdp.mgmt.PDPRegistryRemote;
+import puma.applicationpdp.PDPRegistryRemote;
 import puma.sp.mgmt.provider.pdps.app.ApplicationPDPManager;
 import puma.sp.mgmt.provider.pdps.central.CentralPUMAPDPManager;
 

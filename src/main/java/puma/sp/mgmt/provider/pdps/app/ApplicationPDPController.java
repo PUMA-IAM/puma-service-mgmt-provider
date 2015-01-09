@@ -16,7 +16,8 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 
-import puma.rmi.pdp.mgmt.ApplicationPDPMgmtRemote;
+import puma.applicationpdp.PDPMgmtHelper;
+import puma.sp.mgmt.model.organization.PolicyLangType;
 import puma.sp.mgmt.provider.msgs.MessageManager;
 import puma.sp.mgmt.repositories.policy.PolicyService;
 
@@ -29,7 +30,7 @@ public class ApplicationPDPController {
 	@Autowired
 	private PolicyService policyService;
     
-    private static final String DEFAULT_APPLICATION_POLICY = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n" + 
+    private static final String DEFAULT_APPLICATION_POLICY_XACML = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n" + 
 			"<PolicySet \n" + 
 			"  xmlns=\"urn:oasis:names:tc:xacml:2.0:policy:schema:os\" \n" + 
 			"  xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\"\n" + 
@@ -41,17 +42,26 @@ public class ApplicationPDPController {
 			"	<RemotePolicyReference PolicyId=\"central-puma-policy\"/>\n" + 
 			"</PolicySet>";
     
+    private static final String DEFAULT_APPLICATION_POLICY_STAPL = 
+    		"Policy(\"application-policy\") := apply DenyOverrides to (\n" +
+    		"  RemotePolicy(\"central-puma-policy\")\n" +
+    		")";
+    
     @RequestMapping(value = "/application-pdps")
     public String applicationPDPOverview(ModelMap model, HttpSession session) {
-    	model.addAttribute("application_policy", policyService.getApplicationPolicy());
+    	model.addAttribute("application_policy_xacml", policyService.getApplicationPolicy(PolicyLangType.XACML));
+    	model.addAttribute("application_policy_stapl", policyService.getApplicationPolicy(PolicyLangType.STAPL));
     	model.addAttribute("pdps", ApplicationPDPManager.getInstance().getOverview());
     	model.addAttribute("msgs", MessageManager.getInstance().getMessages(session));
-    	model.addAttribute("default_policy", DEFAULT_APPLICATION_POLICY);
+    	model.addAttribute("default_policy_xacml", DEFAULT_APPLICATION_POLICY_XACML);
+    	model.addAttribute("default_policy_stapl", DEFAULT_APPLICATION_POLICY_STAPL);
     	return "pdps/application-pdps";
     }
     
     @RequestMapping(value = "/application-pdps/{pdpId}")
-    public String applicationPDP(@PathVariable("pdpId") String applicationPDPId, ModelMap model, HttpSession session) {
+    public String applicationPDP(
+    		@PathVariable("pdpId") String applicationPDPId,
+    		ModelMap model, HttpSession session) {
     	ApplicationPDPOverview pdp = ApplicationPDPManager.getInstance().getOverview(applicationPDPId);
     	model.addAttribute("pdp", pdp);
     	model.addAttribute("msgs", MessageManager.getInstance().getMessages(session));
@@ -60,15 +70,15 @@ public class ApplicationPDPController {
     
     @RequestMapping(value = "/application-pdps/policy/load", method = RequestMethod.POST)
     public String loadPolicy(ModelMap model, HttpSession session,
-			@RequestParam("policy") String policy) {
-    	loadPolicy(policy, session);
+			@RequestParam("policy_stapl") String staplPolicy,
+			@RequestParam("policy_xacml") String xacmlPolicy) {
+    	loadPolicy(staplPolicy, xacmlPolicy, session);
     	return "redirect:/application-pdps";
     }
     
     @RequestMapping(value = "/application-pdps/policy/load/default")
     public String loadDefaultApplicationPDP(ModelMap model, HttpSession session) {
-    	String defaultPolicy = DEFAULT_APPLICATION_POLICY;
-    	loadPolicy(defaultPolicy, session);    	
+    	loadPolicy(DEFAULT_APPLICATION_POLICY_STAPL, DEFAULT_APPLICATION_POLICY_XACML, session);    	
     	return "redirect:/application-pdps";
     }
     
@@ -79,18 +89,20 @@ public class ApplicationPDPController {
      * @param policy
      * @param session
      */
-    private void loadPolicy(String policy, HttpSession session) {
+    private void loadPolicy(String staplPolicy, String xacmlPolicy, HttpSession session) {
     	// 1. store into the db
-    	policyService.storeApplicationPolicy(policy);
+    	policyService.storeApplicationPolicy(staplPolicy, PolicyLangType.STAPL);
+    	policyService.storeApplicationPolicy(xacmlPolicy, PolicyLangType.XACML);
     	
     	// 2. load into application PDPs    	
-    	Map<ApplicationPDPMgmtRemote, Exception> errors = new HashMap<ApplicationPDPMgmtRemote, Exception>();
-    	for(ApplicationPDPMgmtRemote appPDP: ApplicationPDPManager.getInstance().getApplicationPDPs()) {
+    	Map<PDPMgmtHelper, Exception> errors = new HashMap<PDPMgmtHelper, Exception>();
+    	for(PDPMgmtHelper helper: ApplicationPDPManager.getInstance().getApplicationPDPs()) {
     		try {
-				appPDP.loadApplicationPolicy(policy);
+				helper.getPDPMgmt("STAPL").loadApplicationPolicy(staplPolicy);
+				helper.getPDPMgmt("XACML").loadApplicationPolicy(xacmlPolicy);
 				logger.info("Succesfully reloaded application policy");
 			} catch (RemoteException e) {
-				errors.put(appPDP, e);
+				errors.put(helper, e);
 				logger.log(Level.WARNING, "Error when loading application policy", e);
 			}
     	}

@@ -55,6 +55,25 @@
 					</div>
 				</div>
 				<div class="form-group">
+					<label for="input-lang-type" class="col-sm-2 control-label">Policy Language</label>
+					<div class="col-sm-10">
+						<c:choose>
+							<c:when test="${empty policyLangValues}">
+							</c:when>
+							<c:otherwise>
+								<c:forEach var="langValue" items="${policyLangValues}" varStatus="status">
+									<div class="radio">
+										<label>
+											<input type="radio" name="lang-type" id="lang-type-option-${langValue}" value="${langValue}">
+												${langValue.name}
+										</label>
+									</div>
+								</c:forEach>
+							</c:otherwise>
+						</c:choose>
+					</div>
+				</div>
+				<div class="form-group">
 					<label for="input-mgmt-type" class="col-sm-2 control-label">Management
 						type</label>
 					<div class="col-sm-10">

@@ -13,6 +13,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 
+import puma.sp.mgmt.model.organization.PolicyLangType;
 import puma.sp.mgmt.model.organization.Tenant;
 import puma.sp.mgmt.model.organization.TenantMgmtType;
 import puma.sp.mgmt.model.user.User;
@@ -37,6 +38,8 @@ public class TenantController {
 				MessageManager.getInstance().getMessages(session));
 
 		model.addAttribute("managementValues", TenantMgmtType.values());
+		model.addAttribute("policyLangValues", PolicyLangType.values());
+		
 		return "tenants/overview";
 	}
 
@@ -44,6 +47,7 @@ public class TenantController {
 	public String createTenantImplementation(ModelMap model,
 			HttpSession session, 
 			@RequestParam("name") String name,
+			@RequestParam("lang-type") String langType,
 			@RequestParam("mgmt-type") String mgmtType,
 			@RequestParam(value = "authn-endpoint", defaultValue = "") String authnEndpoint,
 			@RequestParam(value = "attr-endpoint", defaultValue = "") String attrEndpoint,
@@ -53,9 +57,10 @@ public class TenantController {
 			@RequestParam(value = "password", defaultValue = "admin") String password) {
 		// translate the mgmt type
 		TenantMgmtType realMgmtType = TenantMgmtType.valueOf(mgmtType);
+		PolicyLangType realLangType = PolicyLangType.valueOf(langType);
 		Long tenantId = null;
 		try {
-			Tenant tenant = new Tenant(name, realMgmtType, authnEndpoint, idpPublicKey, attrEndpoint, authzEndpoint);
+			Tenant tenant = new Tenant(name, realMgmtType, authnEndpoint, idpPublicKey, attrEndpoint, authzEndpoint, realLangType);
 			User user = null;
 			if (realMgmtType == TenantMgmtType.Locally) {
 				// also construct user
@@ -91,6 +96,8 @@ public class TenantController {
 		model.addAttribute("managementValues", TenantMgmtType.values());
 		model.addAttribute("msgs",
 				MessageManager.getInstance().getMessages(session));
+		model.addAttribute("policyLangValues", PolicyLangType.values());
+		
 		return "tenants/tenant";
 	}
 
@@ -133,10 +140,11 @@ public class TenantController {
 		
 		// translate the mgmt type
 		TenantMgmtType realMgmtType = TenantMgmtType.valueOf(mgmtType);
+		//PolicyLangType realLangType = PolicyLangType.valueOf(langType); // XXX subtenants use the same policy language as their supertenant (?)
 		
 		try {
 			User user = null;
-			Tenant subtenant = new Tenant(name, realMgmtType, authnEndpoint, idpPublicKey, attrEndpoint, authzEndpoint);
+			Tenant subtenant = new Tenant(name, realMgmtType, authnEndpoint, idpPublicKey, attrEndpoint, authzEndpoint, tenant.getPolicyLanguage());
 			subtenant.setSuperTenant(tenant);
 			if (realMgmtType == TenantMgmtType.Locally) {
 				user = new User();

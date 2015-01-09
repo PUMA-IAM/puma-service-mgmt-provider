@@ -12,6 +12,8 @@ public class ApplicationPDPOverview {
 	
 	private String status;
 	
+	private String langType;
+	
 	private String policy;
 
 	public String getId() {
@@ -30,6 +32,14 @@ public class ApplicationPDPOverview {
 		this.status = status;
 	}
 
+	public String getLangType() {
+		return langType;
+	}
+
+	public void setLangType(String langType) {
+		this.langType = langType;
+	}
+
 	public String getPolicy() {
 		return policy;
 	}
@@ -38,9 +48,10 @@ public class ApplicationPDPOverview {
 		this.policy = policy;
 	}
 	
-	public ApplicationPDPOverview(String id, String status, String policy) {
+	public ApplicationPDPOverview(String id, String status, String langType, String policy) {
 		this.id = id;
 		this.status = status;
+		this.langType = langType;
 		this.policy = policy;
 	}
 
