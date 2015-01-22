@@ -29,20 +29,15 @@ public class CentralPUMAPDPController {
 	
 	
 	private static final String DEFAULT_CENTRAL_PUMA_PDP_POLICY_STAPL =
-			"resource.type = SimpleAttribute(String)\n" +
-			"action.id = SimpleAttribute(String)\n" +
-			"subject.tenant = SimpleAttribute(String)\n" +
-			"resource.creating_tenant = SimpleAttribute(\"creating-tenant\", String)\n" +
-			"\n" +
-			"Policy(\"central-puma-policy\") := when (resource.type === \"document\") apply DenyOverrides to (\n" +
-			"  Policy(\"policy:reading-deleting\") := when ((action.id === \"read\") | (action.id === \"delete\")) apply DenyOverrides to (\n" +
-			"    Rule(\"policy:1\") := deny iff (!(resource.creating_tenant === subject.tenant)),\n" +
-			"    Rule(\"default-permit1\") := permit\n" +
-			"  )," +
-			"  Policy(\"policy:creating\") := when (action.id === \"create\") apply DenyOverrides to (\n" +
-			"    Rule(\"default-permit99\") := permit\n" +
+			"Policy(\"central-puma-policy\") := when (resource.type_ === \"document\") apply DenyOverrides to(\n" +
+			"  Policy(\"reading-deleting\") := when ((action.id === \"read\") | (action.id === \"delete\")) apply DenyOverrides to(\n" +
+			"    Rule(\"1\") := deny iff (!(resource.creating_tenant in subject.tenant)),\n" +
+			"    Rule(\"default-permit:1\") := permit\n" +
+			"  ),\n" +
+			"  Policy(\"creating\") := when (action.id === \"create\") apply DenyOverrides to(\n" +
+			"    Rule(\"default-permit:99\") := permit\n" +
 			"  )\n" +
-			")";
+			")\n";
     
     private static final String DEFAULT_CENTRAL_PUMA_PDP_POLICY_XACML = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n" + 
     		"<PolicySet  xmlns=\"urn:oasis:names:tc:xacml:2.0:policy:schema:os\" \n" + 
