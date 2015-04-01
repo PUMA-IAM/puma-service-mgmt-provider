@@ -26,10 +26,10 @@
 		<div class="col-md-12">
 			<h2>Current</h2>
 				<h3>STAPL</h3>
-				<pre class="prettyprint linenums"><c:out value="${central_policy_stapl}" /></pre>
+				<pre class="prettyprint linenums"><c:out value="${central_policy_stapl.content}" /></pre>
 				
 				<h3>XACML</h3>
-				<pre class="prettyprint linenums"><c:out value="${central_policy_xacml}" /></pre>
+				<pre class="prettyprint linenums"><c:out value="${central_policy_xacml.content}" /></pre>
 		</div>
 	</div>
 
@@ -41,12 +41,12 @@
 				<h3>STAPL</h3>
 				<div class="form-group">
 					<textarea class="form-control" style="width: 100%; height: 500px;"
-						name="staplPolicy"><c:out value="${central_policy_stapl}" /></textarea>
+						name="staplPolicy"><c:out value="${central_policy_stapl.content}" /></textarea>
 				</div>
 				<h3>XACML</h3>
 				<div class="form-group">
 					<textarea class="form-control" style="width: 100%; height: 500px;"
-						name="xacmlPolicy"><c:out value="${central_policy_xacml}" /></textarea>
+						name="xacmlPolicy"><c:out value="${central_policy_xacml.content}" /></textarea>
 				</div>
 				<div class="form-group">
 					<button type="submit" class="btn btn-default">Deploy
