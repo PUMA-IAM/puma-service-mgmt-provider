@@ -192,7 +192,7 @@ public class CentralPUMAPDPController {
 			CentralPUMAPDPManager.getInstance().getCentralPUMAPDP(PolicyLangType.XACML.name()).loadCentralPUMAPolicy(xacmlPolicy);
 			logger.info("Succesfully reloaded Central PUMA PDP policy");
     		MessageManager.getInstance().addMessage(session, "success", "Policy loaded into Central PUMA PDP.");
-		} catch (RemoteException e) {
+		} catch (Exception e) {
 			MessageManager.getInstance().addMessage(session, "warning", e.getMessage());
 			logger.log(Level.WARNING, "Error when loading Central PUMA PDP policy", e);
 		}

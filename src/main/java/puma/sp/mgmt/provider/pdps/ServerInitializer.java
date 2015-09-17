@@ -37,7 +37,8 @@ public class ServerInitializer implements ServletContextListener {
 	public void contextInitialized(ServletContextEvent arg0) {
 		// 1. Set up the RMI registry and the Application PDP Registry listening
 		// on it
-		try {
+		// XXX not necessary anymore
+		/*try {
 			Registry registry;
 			try {
 				registry = LocateRegistry.createRegistry(RMI_REGISITRY_PORT);
@@ -60,6 +61,6 @@ public class ServerInitializer implements ServletContextListener {
 		CentralPUMAPDPManager.getInstance(); // just getting the instance calls
 												// the constructor and
 												// initializes the manager
-	}
+	*/}
 
 }

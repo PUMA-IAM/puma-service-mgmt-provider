@@ -1,6 +1,6 @@
 package puma.sp.mgmt.provider.pdps.app;
 
-import java.rmi.RemoteException;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedList;
@@ -11,11 +11,9 @@ import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import puma.applicationpdp.PDPMgmtHelper;
-import puma.applicationpdp.PDPRegistryRemote;
-import puma.rmi.pdp.mgmt.ApplicationPDPMgmtRemote;
+import puma.rest.client.AppPDPClient;
 
-public class ApplicationPDPManager implements PDPRegistryRemote {
+public class ApplicationPDPManager {
 
 	private static final Logger logger = Logger
 			.getLogger(ApplicationPDPManager.class.getName());
@@ -29,13 +27,13 @@ public class ApplicationPDPManager implements PDPRegistryRemote {
 		return instance;
 	}
 	
-	private Set<PDPMgmtHelper> pdpHelpers = new HashSet<PDPMgmtHelper>();
+	private Set<AppPDPClient> pdpHelpers = new HashSet<>();
 	
-	public Set<PDPMgmtHelper> getApplicationPDPs() {
+	public Set<AppPDPClient> getApplicationPDPs() {
 		return this.pdpHelpers;
 	}
 	
-	private Map<String, Tuple<String, ApplicationPDPMgmtRemote>> applicationPDPsById = new HashMap<String, Tuple<String, ApplicationPDPMgmtRemote>>();
+	private Map<String, Tuple<String, AppPDPClient>> applicationPDPsById = new HashMap<>();
 	
 	private static class Tuple<L,R> {
 		private L left;
@@ -54,9 +52,17 @@ public class ApplicationPDPManager implements PDPRegistryRemote {
 			return right;
 		}
 	}
+	
+	public Iterable<AppPDPClient> getPDPsByName(String name) {
+		ArrayList<AppPDPClient> list = new ArrayList<>();
+		for(Tuple<String, AppPDPClient> tuple : applicationPDPsById.values()) {
+			if(tuple.getLeft().equals(name)) list.add(tuple.getRight());
+		}
+		return list;
+	}
 
-	@Override
-	public void register(PDPMgmtHelper helper) {
+	public void register(String baseUrl, String name) {
+		final AppPDPClient client = new AppPDPClient(baseUrl, name);
 		/*String pdpId;
 		try {
 			pdpId = applicationPDP.getId();
@@ -64,31 +70,26 @@ public class ApplicationPDPManager implements PDPRegistryRemote {
 			logger.log(Level.SEVERE, "WTF, cannot reach the Application PDP the moment it registers itself?", e);
 			return;
 		}*/
-		Map<String, ApplicationPDPMgmtRemote> pdps = helper.getAll();
 		try {
-			for(Entry<String, ApplicationPDPMgmtRemote> entry : pdps.entrySet()) {
-				final ApplicationPDPMgmtRemote pdp = entry.getValue();
-				this.applicationPDPsById.put(pdp.getId(), new Tuple<>(entry.getKey(), pdp));
-			}
-		} catch (RemoteException e) {
+			logger.log(Level.INFO, "Received Application PDP registration: " + baseUrl + " - " + name);
+			this.applicationPDPsById.put(client.getId(), new Tuple<>(name, client));
+		} catch (Exception e) {
 			logger.log(Level.SEVERE, "WTF, cannot reach the Application PDP the moment it registers itself?", e);
 			return;
 		}
-		this.pdpHelpers.add(helper);
-		logger.info("Received Application PDP registration");
+		this.pdpHelpers.add(client);
+		logger.info("Completed Application PDP registration");
 	}
 
-	@Override
-	public void deregister(PDPMgmtHelper helper) {
-		this.pdpHelpers.remove(helper);
-		for(ApplicationPDPMgmtRemote pdp : helper.getAll().values()) {
-			this.applicationPDPsById.remove(getId(pdp));
-		}
+	public void deregister(String baseUrl, String name) {
+		final AppPDPClient client = new AppPDPClient(baseUrl, name);
+		this.pdpHelpers.remove(client);
+		this.applicationPDPsById.remove(getId(client));
 		logger.info("Received Application PDP deregistration");
 	}
 	
-	private String getId(ApplicationPDPMgmtRemote applicationPDP) {
-		for(Entry<String, Tuple<String, ApplicationPDPMgmtRemote>> e: this.applicationPDPsById.entrySet()) {
+	private String getId(AppPDPClient applicationPDP) {
+		for(Entry<String, Tuple<String, AppPDPClient>> e: this.applicationPDPsById.entrySet()) {
 			if(e.getValue().getRight() == applicationPDP) {
 				return e.getKey();
 			}
@@ -118,7 +119,7 @@ public class ApplicationPDPManager implements PDPRegistryRemote {
 	 * @return
 	 */
 	public ApplicationPDPOverview getOverview(String pdpId) {
-		Tuple<String, ApplicationPDPMgmtRemote> tuple = applicationPDPsById.get(pdpId);
+		Tuple<String, AppPDPClient> tuple = applicationPDPsById.get(pdpId);
 		return buildOverview(tuple.getLeft(), tuple.getRight());
 	}
 	
@@ -128,24 +129,24 @@ public class ApplicationPDPManager implements PDPRegistryRemote {
 	 * @param pdp
 	 * @return
 	 */
-	private ApplicationPDPOverview buildOverview(String langType, ApplicationPDPMgmtRemote pdp) {
+	private ApplicationPDPOverview buildOverview(String langType, AppPDPClient pdp) {
 		String status;
 		try {
 			status = pdp.getStatus();
-		} catch (RemoteException e) {
-			status = "RemoteException: " + e.getMessage();
+		} catch (Exception e) {
+			status = "Exception: " + e.getMessage();
 		}
 		String id;
 		try {
 			id = pdp.getId();
-		} catch (RemoteException e) {
-			id = "RemoteException: " + e.getMessage();
+		} catch (Exception e) {
+			id = "Exception: " + e.getMessage();
 		}
 		String policy;
 		try {
 			policy = pdp.getApplicationPolicy();
-		} catch (RemoteException e) {
-			policy = "RemoteException: " + e.getMessage();
+		} catch (Exception e) {
+			policy = "Exception: " + e.getMessage();
 		}
 		return new ApplicationPDPOverview(id, status, langType, policy);
 	}

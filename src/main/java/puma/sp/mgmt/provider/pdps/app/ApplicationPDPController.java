@@ -9,14 +9,20 @@ import java.util.logging.Logger;
 import javax.servlet.http.HttpSession;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.ModelMap;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.bind.annotation.ResponseStatus;
 
 import puma.applicationpdp.PDPMgmtHelper;
+import puma.rest.client.AppPDPClient;
+import puma.rest.domain.PDPAddress;
 import puma.sp.mgmt.model.organization.PolicyLangType;
 import puma.sp.mgmt.provider.msgs.MessageManager;
 import puma.sp.mgmt.repositories.policy.PolicyService;
@@ -82,6 +88,18 @@ public class ApplicationPDPController {
     	return "redirect:/application-pdps";
     }
     
+    @ResponseStatus(value = HttpStatus.OK)
+    @RequestMapping(value = "/application-pdps/register", method = RequestMethod.PUT)
+    public void registerPDP(@RequestBody PDPAddress address) {
+    	ApplicationPDPManager.getInstance().register(address.getBaseUrl(), address.getName());
+    }
+    
+    @ResponseStatus(value = HttpStatus.OK)
+    @RequestMapping(value = "/application-pdps/deregister", method = RequestMethod.PUT)
+    public void deregisterPDP(@RequestBody PDPAddress address) {
+    	ApplicationPDPManager.getInstance().deregister(address.getBaseUrl(), address.getName());
+    }
+    
     /**
      * Helper function for loading a policy into the Application PDPs, storing it 
      * in the database and putting errors into session Messages.
@@ -95,17 +113,26 @@ public class ApplicationPDPController {
     	policyService.storeApplicationPolicy(xacmlPolicy, PolicyLangType.XACML);
     	
     	// 2. load into application PDPs    	
-    	Map<PDPMgmtHelper, Exception> errors = new HashMap<PDPMgmtHelper, Exception>();
-    	for(PDPMgmtHelper helper: ApplicationPDPManager.getInstance().getApplicationPDPs()) {
+    	Map<AppPDPClient, Exception> errors = new HashMap<>();
+    	for(AppPDPClient client: ApplicationPDPManager.getInstance().getPDPsByName("STAPL")) {
     		try {
-				helper.getPDPMgmt("STAPL").loadApplicationPolicy(staplPolicy);
-				helper.getPDPMgmt("XACML").loadApplicationPolicy(xacmlPolicy);
+				client.loadApplicationPolicy(staplPolicy);
 				logger.info("Succesfully reloaded application policy");
-			} catch (RemoteException e) {
-				errors.put(helper, e);
+			} catch (Exception e) {
+				errors.put(client, e);
 				logger.log(Level.WARNING, "Error when loading application policy", e);
 			}
     	}
+    	for(AppPDPClient client: ApplicationPDPManager.getInstance().getPDPsByName("XACML")) {
+    		try {
+				client.loadApplicationPolicy(xacmlPolicy);
+				logger.info("Succesfully reloaded application policy");
+			} catch (Exception e) {
+				errors.put(client, e);
+				logger.log(Level.WARNING, "Error when loading application policy", e);
+			}
+    	}
+    	
     	if(errors.isEmpty()) {
     		MessageManager.getInstance().addMessage(session, "success", "Policy loaded");
     	} else {

@@ -13,6 +13,7 @@ public class TimingController {
 
 	@RequestMapping(value = "/metrics/central-pdp/{language}/results", method = RequestMethod.GET, produces="text/plain")
 	public @ResponseBody String results(@PathVariable("language") String language) {
-		return CentralPUMAPDPManager.getInstance().getMetrics(language);
+		//return CentralPUMAPDPManager.getInstance().getMetrics(language);
+		return "Not supported right now. Sorry :(";
 	}
 }
